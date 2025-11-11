@@ -1,0 +1,191 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Search</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleFilters()">
+        <ion-icon 
+          slot="icon-only" 
+          [name]="showFilters ? 'funnel' : 'funnel-outline'"
+          [color]="hasActiveFilters ? 'primary' : undefined"
+        ></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionInput)="onSearchInput($event)"
+      (ionClear)="clearSearch()"
+      placeholder="Search articles and parts..."
+      debounce="300"
+      animated="true"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="search-container">
+    <!-- Filters Panel -->
+    <div class="filters-panel" *ngIf="showFilters">
+      <!-- Sort Order Filter -->
+      <div class="sort-filter">
+        <h4 class="filter-label">Sort By</h4>
+        <ion-segment [(ngModel)]="sortOrder" (ionChange)="onSortOrderChange(sortOrder)">
+          <ion-segment-button value="latest">
+            <ion-label>Latest First</ion-label>
+            <ion-icon name="arrow-down"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="oldest">
+            <ion-label>Oldest First</ion-label>
+            <ion-icon name="arrow-up"></ion-icon>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <app-topic-filter
+        [topics]="topics"
+        [selectedTopic]="selectedTopic"
+        (topicSelected)="onTopicSelected($event)"
+        (clearSelection)="onTopicCleared()"
+      ></app-topic-filter>
+
+      <app-tag-filter
+        [tags]="tags"
+        [selectedTags]="selectedTags"
+        (tagSelected)="onTagSelected($event)"
+        (tagDeselected)="onTagDeselected($event)"
+        (clearAll)="onClearAllTags()"
+      ></app-tag-filter>
+    </div>
+
+    <!-- Active Filters Summary -->
+    <div class="active-filters" *ngIf="hasActiveFilters && !showFilters">
+      <ion-chip 
+        *ngIf="selectedTopic"
+        color="primary"
+        (click)="onTopicCleared()"
+      >
+        <ion-label>Topic</ion-label>
+        <ion-icon name="close-circle"></ion-icon>
+      </ion-chip>
+      
+      <ion-chip 
+        *ngIf="selectedTags.length > 0"
+        color="primary"
+        (click)="onClearAllTags()"
+      >
+        <ion-label>{{ selectedTags.length }} tag{{ selectedTags.length > 1 ? 's' : '' }}</ion-label>
+        <ion-icon name="close-circle"></ion-icon>
+      </ion-chip>
+    </div>
+
+    <!-- Loading -->
+    <app-skeleton-loader *ngIf="loading" variant="list" [count]="5"></app-skeleton-loader>
+
+    <!-- Error -->
+    <ion-card *ngIf="errorMessage && !loading" color="danger">
+      <ion-card-content>{{ errorMessage }}</ion-card-content>
+    </ion-card>
+
+    <!-- Pre-loaded Articles (default view) -->
+    <div *ngIf="!searched && !loading && articles.length > 0" class="articles-list">
+      <ion-list>
+        <ion-item
+          *ngFor="let article of paginatedArticles"
+          [routerLink]="['/articles', article.slug]"
+          button="true"
+          detail="true"
+        >
+          <ion-thumbnail slot="start" *ngIf="article.cover_image">
+            <img [src]="article.cover_image" [alt]="article.title" />
+          </ion-thumbnail>
+          <ion-label>
+            <h2>{{ article.title }}</h2>
+            <p *ngIf="article.excerpt">{{ article.excerpt }}</p>
+            <div class="article-footer">
+              <ion-badge color="primary">article</ion-badge>
+              <span class="publish-date" *ngIf="article.published_at">
+                {{ article.published_at | date: 'MMM d, yyyy' }}
+              </span>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Pagination Controls -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <ion-button 
+          fill="clear" 
+          [disabled]="currentPage === 1"
+          (click)="previousPage()"
+        >
+          <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+        </ion-button>
+
+        <div class="page-info">
+          <span class="page-text">Page {{ currentPage }} of {{ totalPages }}</span>
+          <div class="page-dots">
+            <span 
+              *ngFor="let page of [].constructor(totalPages); let i = index"
+              class="page-dot"
+              [class.active]="currentPage === i + 1"
+              (click)="goToPage(i + 1)"
+            ></span>
+          </div>
+        </div>
+
+        <ion-button 
+          fill="clear" 
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+        >
+          <ion-icon slot="icon-only" name="chevron-forward"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div *ngIf="searched && !loading && results.length > 0" class="results">
+      <p class="results-count">{{ results.length }} results found</p>
+
+      <ion-list>
+        <ion-item
+          *ngFor="let result of results"
+          [routerLink]="getResultLink(result)"
+          button="true"
+          detail="true"
+        >
+          <ion-thumbnail slot="start" *ngIf="result.image">
+            <img [src]="result.image" [alt]="result.title" />
+          </ion-thumbnail>
+          <ion-label>
+            <h2 [innerHTML]="getHighlightedTitle(result) | highlight"></h2>
+            <p *ngIf="result.excerpt" [innerHTML]="getHighlightedExcerpt(result) | highlight"></p>
+            <div class="result-footer">
+              <ion-badge [color]="result.type === 'article' ? 'primary' : 'secondary'">
+                {{ result.type }}
+              </ion-badge>
+              <span class="relevance" *ngIf="result.relevance_score">
+                {{ (result.relevance_score * 100).toFixed(0) }}% match
+              </span>
+            </div>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- No Results -->
+    <div class="empty-state" *ngIf="searched && !loading && results.length === 0">
+      <ion-icon name="document-outline" size="large"></ion-icon>
+      <h3>No Results</h3>
+      <p>Try different keywords or clear filters</p>
+      <ion-button 
+        *ngIf="hasActiveFilters"
+        fill="clear" 
+        (click)="clearAllFilters()"
+      >
+        Clear Filters
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

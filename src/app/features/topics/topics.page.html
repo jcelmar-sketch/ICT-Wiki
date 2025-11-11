@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Topics</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="topics-container">
+    <h2>Browse by Topic</h2>
+    <p class="subtitle">Explore articles organized by category</p>
+
+    <!-- Loading -->
+    <app-skeleton-loader *ngIf="loading" variant="list" [count]="3"></app-skeleton-loader>
+
+    <!-- Error -->
+    <ion-card *ngIf="errorMessage" color="danger">
+      <ion-card-content>{{ errorMessage }}</ion-card-content>
+    </ion-card>
+
+    <!-- Topics Grid -->
+    <div class="topics-grid" *ngIf="!loading">
+      <ion-card
+        *ngFor="let topic of topics"
+        [routerLink]="['/tabs/topics', topic.slug]"
+        button="true"
+        class="topic-card"
+      >
+        <ion-card-content>
+          <ion-icon [name]="topic.icon || 'folder-outline'" size="large"></ion-icon>
+          <h3>{{ topic.name }}</h3>
+          <p>{{ topic.description }}</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

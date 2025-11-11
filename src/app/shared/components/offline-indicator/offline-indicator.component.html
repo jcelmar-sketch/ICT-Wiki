@@ -1,0 +1,16 @@
+<div class="offline-indicator" [class.offline]="!isOnline" [class.show]="showToast">
+  <div class="indicator-content">
+    <ion-icon [name]="statusIcon"></ion-icon>
+    <span>{{ statusMessage }}</span>
+  </div>
+</div>
+
+<!-- Persistent Badge (Optional - can be toggled) -->
+<ion-badge 
+  *ngIf="!isOnline" 
+  class="offline-badge"
+  color="warning"
+>
+  <ion-icon name="cloud-offline-outline"></ion-icon>
+  Offline
+</ion-badge>

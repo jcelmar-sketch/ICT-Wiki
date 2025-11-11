@@ -1,0 +1,27 @@
+:host {
+  display: block;
+}
+
+.skeleton-card {
+  margin-bottom: 16px;
+  
+  &.part-card {
+    // Part cards may have different styling
+  }
+}
+
+.skeleton-detail {
+  padding: 16px;
+}
+
+.skeleton-item {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  margin-bottom: 8px;
+}
+
+// Smooth animation override
+ion-skeleton-text {
+  --background: var(--ion-color-light);
+  --background-rgb: var(--ion-color-light-rgb);
+}

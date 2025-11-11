@@ -1,0 +1,108 @@
+:host {
+  display: block;
+}
+
+.article-card {
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--ion-box-shadow-large);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .cover-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+  }
+
+  ion-card-content {
+    padding: 16px;
+  }
+
+  .topic-badge {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .article-title {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    margin: 8px 0 12px;
+    color: var(--ion-text-color);
+
+    // Clamp to 2 lines
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-excerpt {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ion-color-step-600, #666666); // Better contrast than medium
+    margin-bottom: 12px;
+
+    // Clamp to 3 lines
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--ion-color-step-600, #666666);
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+
+  // Grid layout variant
+  &.grid-layout {
+    .cover-image {
+      height: 160px;
+    }
+
+    .article-title {
+      font-size: 18px;
+    }
+
+    .article-excerpt {
+      -webkit-line-clamp: 2;
+    }
+  }
+}
+
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  .article-card {
+    .article-title {
+      color: var(--ion-text-color);
+    }
+    
+    .article-excerpt {
+      color: var(--ion-color-step-400, #999999);
+    }
+    
+    .article-meta {
+      color: var(--ion-color-step-400, #999999);
+    }
+  }
+}

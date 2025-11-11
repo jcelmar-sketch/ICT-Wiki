@@ -1,0 +1,35 @@
+<ion-card
+  [routerLink]="['/articles', article.slug]"
+  button="true"
+  class="article-card"
+  [class.grid-layout]="layout === 'grid'"
+>
+  <!-- Cover Image -->
+  <img
+    [src]="imageUrl"
+    [alt]="article.title"
+    class="cover-image"
+    loading="lazy"
+  />
+
+  <ion-card-content>
+    <!-- Topic Badge -->
+    <ion-badge color="primary" class="topic-badge">
+      {{ article.topic_name }}
+    </ion-badge>
+
+    <!-- Title -->
+    <h3 class="article-title">{{ article.title }}</h3>
+
+    <!-- Excerpt -->
+    <p class="article-excerpt" *ngIf="article.excerpt">
+      {{ article.excerpt }}
+    </p>
+
+    <!-- Metadata -->
+    <div class="article-meta">
+      <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
+      <time [attr.datetime]="article.published_at">{{ formattedDate }}</time>
+    </div>
+  </ion-card-content>
+</ion-card>

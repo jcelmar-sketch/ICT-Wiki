@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Article</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading -->
+  <app-skeleton-loader *ngIf="loading" variant="article-detail"></app-skeleton-loader>
+
+  <!-- Error -->
+  <ion-card *ngIf="errorMessage && !loading" color="danger">
+    <ion-card-content>
+      <p>{{ errorMessage }}</p>
+      <ion-button expand="block" routerLink="/tabs/home">Go Home</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Article Content -->
+  <article *ngIf="article && !loading" class="article-content">
+    <!-- Cover Image -->
+    <img
+      *ngIf="article.cover_image"
+      [src]="article.cover_image"
+      [alt]="article.title"
+      class="cover-image"
+    />
+
+    <div class="article-body">
+      <!-- Title -->
+      <h1>{{ article.title }}</h1>
+
+      <!-- Metadata -->
+      <div class="article-meta">
+        <ion-chip *ngIf="article.published_at">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <ion-label>{{ formattedDate }}</ion-label>
+        </ion-chip>
+        <ion-chip>
+          <ion-icon name="eye-outline"></ion-icon>
+          <ion-label>{{ article.view_count }} views</ion-label>
+        </ion-chip>
+      </div>
+
+      <!-- Content (Markdown) -->
+      <div class="markdown-content" [innerHTML]="article.content | markdown"></div>
+
+      <!-- Related Articles -->
+      <section *ngIf="relatedArticles.length > 0" class="related-section">
+        <h2>You May Also Like</h2>
+        <div class="related-grid">
+          <ion-card
+            *ngFor="let related of relatedArticles"
+            [routerLink]="['/articles', related.slug]"
+            button="true"
+            class="related-card"
+          >
+            <img
+              *ngIf="related.cover_image"
+              [src]="related.cover_image"
+              [alt]="related.title"
+            />
+            <ion-card-content>
+              <h3>{{ related.title }}</h3>
+              <p *ngIf="related.excerpt">{{ related.excerpt }}</p>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </section>
+
+      <!-- Related Loading -->
+      <app-skeleton-loader
+        *ngIf="loadingRelated"
+        variant="article-card"
+        [count]="3"
+      ></app-skeleton-loader>
+    </div>
+  </article>
+</ion-content>

@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Computer Parts</ion-title>
+  </ion-toolbar>
+
+  <!-- Category Filter -->
+  <ion-toolbar>
+    <ion-segment 
+      [value]="selectedCategory" 
+      (ionChange)="onCategoryChange($event)"
+      scrollable="true"
+      mode="md"
+    >
+      <ion-segment-button 
+        *ngFor="let cat of categories" 
+        [value]="cat.value"
+      >
+        <ion-label>{{ cat.label }}</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading Skeleton -->
+  <div *ngIf="loading" class="parts-loading">
+    <app-skeleton-loader variant="part-card" [count]="6"></app-skeleton-loader>
+  </div>
+
+  <!-- Parts Grid -->
+  <div *ngIf="!loading" class="parts-grid">
+    <ion-card 
+      *ngFor="let part of parts" 
+      class="part-card"
+      [routerLink]="['/parts', part.slug]"
+      button
+    >
+      <img 
+        [src]="part.image_url || 'assets/images/placeholder-part.svg'" 
+        [alt]="part.name"
+        class="part-image"
+      />
+      
+      <ion-card-header>
+        <ion-chip class="category-chip">
+          <ion-label>{{ getCategoryLabel(part.category) }}</ion-label>
+        </ion-chip>
+        <ion-card-title>{{ part.name }}</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <p class="part-description">{{ part.description }}</p>
+        
+        <div class="specs-preview" *ngIf="part.specifications">
+          <ion-icon name="hardware-chip-outline"></ion-icon>
+          <span>{{ getSpecsCount(part.specifications) }} specs</span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && parts.length === 0" class="empty-state">
+    <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
+    <h2>No Parts Found</h2>
+    <p>Try selecting a different category</p>
+  </div>
+
+  <!-- Infinite Scroll -->
+  <ion-infinite-scroll 
+    *ngIf="!loading && hasMore"
+    (ionInfinite)="loadMore($event)"
+    threshold="100px"
+  >
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Loading more parts..."
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

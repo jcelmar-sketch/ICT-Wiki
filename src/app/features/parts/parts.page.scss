@@ -1,0 +1,174 @@
+/**
+ * Parts Page Styles
+ * Tasks T062-T067: Parts catalog with category filters
+ */
+
+// Category Filter
+ion-segment {
+  --background: var(--ion-color-light);
+  padding: 8px 16px;
+}
+
+ion-segment-button {
+  min-width: auto;
+  font-size: 14px;
+  
+  &::part(indicator-background) {
+    background: var(--ion-color-primary);
+  }
+}
+
+// Parts Grid
+.parts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 16px;
+  padding-bottom: 96px !important; // Ensure enough space for tab bar in production
+  width: 100%;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    padding: 24px;
+    padding-bottom: 96px !important; // Ensure enough space for tab bar in production
+  }
+}
+
+// Part Card
+.part-card {
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(-2px);
+  }
+}
+
+.part-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background-color: var(--ion-color-light);
+  
+  @media (min-width: 768px) {
+    height: 240px;
+  }
+}
+
+ion-card-header {
+  padding-bottom: 8px;
+  
+  ion-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-top: 8px;
+    color: var(--ion-text-color);
+  }
+}
+
+.category-chip {
+  font-size: 12px;
+  height: 24px;
+  background-color: var(--ion-color-primary-tint);
+  color: var(--ion-color-primary-contrast);
+}
+
+ion-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.part-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ion-color-step-600, #666666);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.specs-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ion-color-step-600, #666666);
+  margin-top: auto;
+  
+  ion-icon {
+    font-size: 16px;
+  }
+}
+
+// Loading State
+.parts-loading {
+  padding: 16px;
+  
+  @media (min-width: 768px) {
+    padding: 24px;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  min-height: 50vh;
+  
+  .empty-icon {
+    font-size: 80px;
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+  }
+  
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    margin: 0 0 8px;
+  }
+  
+  p {
+    font-size: 14px;
+    color: var(--ion-color-step-600, #666666);
+    margin: 0;
+  }
+}
+
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  .part-description {
+    color: var(--ion-color-step-400, #999999);
+  }
+
+  .specs-preview {
+    color: var(--ion-color-step-400, #999999);
+  }
+
+  .empty-state p {
+    color: var(--ion-color-step-400, #999999);
+  }
+}

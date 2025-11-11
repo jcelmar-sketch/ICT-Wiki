@@ -1,0 +1,93 @@
+/**
+ * Topics Page Styles
+ * Tasks T030, T038: Topics navigation with improved contrast
+ */
+
+.topics-container {
+  padding: 16px;
+  padding-bottom: 96px !important; // Ensure enough space for tab bar in production
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+
+  h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: var(--ion-text-color);
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--ion-color-step-600, #666666);
+    margin: 0 0 24px;
+  }
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+}
+
+.topic-card {
+  margin: 0;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  ion-card-content {
+    text-align: center;
+    padding: 24px 16px;
+
+    ion-icon {
+      color: var(--ion-color-primary);
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: var(--ion-text-color);
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--ion-color-step-600, #666666);
+      margin: 0;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Dark mode
+@media (prefers-color-scheme: dark) {
+  .topics-container {
+    .subtitle {
+      color: var(--ion-color-step-400, #999999);
+    }
+  }
+
+  .topic-card {
+    ion-card-content {
+      p {
+        color: var(--ion-color-step-400, #999999);
+      }
+    }
+  }
+}
