@@ -24,14 +24,12 @@ ion-segment-button {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
   padding: 16px;
-  padding-bottom: 96px !important; // Ensure enough space for tab bar in production
   width: 100%;
   
   @media (min-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 20px;
     padding: 24px;
-    padding-bottom: 96px !important; // Ensure enough space for tab bar in production
   }
 }
 

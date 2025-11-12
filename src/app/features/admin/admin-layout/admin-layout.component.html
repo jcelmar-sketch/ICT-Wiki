@@ -1,0 +1,103 @@
+<ion-split-pane contentId="admin-content">
+  <!-- Sidebar Menu -->
+  <ion-menu contentId="admin-content" type="overlay">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Admin Panel</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    
+    <ion-content>
+      <ion-list>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item button (click)="navigate('dashboard')" routerLink="/admin/dashboard" routerLinkActive="active">
+            <ion-icon slot="start" name="speedometer-outline"></ion-icon>
+            <ion-label>Dashboard</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('articles')" routerLink="/admin/articles" routerLinkActive="active">
+            <ion-icon slot="start" name="document-text-outline"></ion-icon>
+            <ion-label>Articles</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('parts')" routerLink="/admin/parts" routerLinkActive="active">
+            <ion-icon slot="start" name="hardware-chip-outline"></ion-icon>
+            <ion-label>Computer Parts</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('categories')" routerLink="/admin/categories" routerLinkActive="active">
+            <ion-icon slot="start" name="folder-outline"></ion-icon>
+            <ion-label>Topics</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('activity')" routerLink="/admin/activity" routerLinkActive="active">
+            <ion-icon slot="start" name="list-outline"></ion-icon>
+            <ion-label>Activity Log</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('trash')" routerLink="/admin/trash" routerLinkActive="active">
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            <ion-label>Trash</ion-label>
+          </ion-item>
+
+          <ion-item button (click)="navigate('settings')" routerLink="/admin/settings" routerLinkActive="active">
+            <ion-icon slot="start" name="settings-outline"></ion-icon>
+            <ion-label>Settings</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+
+    <ion-footer>
+      <ion-toolbar>
+        <ion-item lines="none" *ngIf="currentUser$ | async as user">
+          <ion-icon slot="start" name="person-circle-outline"></ion-icon>
+          <ion-label>
+            <p>{{ user.email }}</p>
+            <p class="user-role">{{ user.role }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-button expand="block" fill="clear" (click)="logout()">
+          <ion-icon slot="start" name="log-out-outline"></ion-icon>
+          Logout
+        </ion-button>
+      </ion-toolbar>
+    </ion-footer>
+  </ion-menu>
+
+  <!-- Main Content -->
+  <div class="ion-page" id="admin-content">
+    <!-- Header -->
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>ICT Wiki Admin</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="logout()" aria-label="Logout">
+            <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+
+      <!-- Session Warning Banner -->
+      <ion-toolbar *ngIf="sessionWarning" color="warning">
+        <ion-item lines="none" color="warning">
+          <ion-icon slot="start" name="warning-outline"></ion-icon>
+          <ion-label>
+            Your session is expiring soon.
+          </ion-label>
+          <ion-button slot="end" size="small" (click)="extendSession()">
+            Stay Logged In
+          </ion-button>
+        </ion-item>
+      </ion-toolbar>
+    </ion-header>
+
+    <!-- Page Content -->
+    <ion-content>
+      <router-outlet></router-outlet>
+    </ion-content>
+  </div>
+</ion-split-pane>

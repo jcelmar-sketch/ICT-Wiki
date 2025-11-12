@@ -82,8 +82,39 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     'intel-core-i5-14600k',
     'cpu',
     'Mid-range gaming processor with 14 cores (6 P-cores + 8 E-cores) offering excellent value for 1440p gaming and productivity tasks at an affordable price point.',
+    NULL,
     '{"cores": 14, "threads": 20, "base_clock": "3.5 GHz", "boost_clock": "5.3 GHz", "tdp": "125W", "socket": "LGA1700", "cache_l3": "24 MB"}'::jsonb,
     'Intel'
+  ),
+  (
+    'aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d'::uuid,
+    'AMD Ryzen 7 7800X3D',
+    'amd-ryzen-7-7800x3d',
+    'cpu',
+    'Gaming-focused 8-core processor with 96MB 3D V-Cache technology for exceptional gaming performance. Best choice for pure gaming builds with excellent efficiency.',
+    NULL,
+    '{"cores": 8, "threads": 16, "base_clock": "4.2 GHz", "boost_clock": "5.0 GHz", "tdp": "120W", "socket": "AM5", "cache_l3": "96 MB"}'::jsonb,
+    'AMD'
+  ),
+  (
+    'bb2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e'::uuid,
+    'Intel Core i7-14700K',
+    'intel-core-i7-14700k',
+    'cpu',
+    'Powerful 20-core processor (8 P-cores + 12 E-cores) ideal for content creation and gaming. Excellent all-around performance at a competitive price.',
+    NULL,
+    '{"cores": 20, "threads": 28, "base_clock": "3.4 GHz", "boost_clock": "5.6 GHz", "tdp": "125W", "socket": "LGA1700", "cache_l3": "33 MB"}'::jsonb,
+    'Intel'
+  ),
+  (
+    'cc3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f'::uuid,
+    'AMD Ryzen 5 7600X',
+    'amd-ryzen-5-7600x',
+    'cpu',
+    'Budget-friendly 6-core processor with excellent single-threaded performance. Perfect for 1080p/1440p gaming and everyday productivity tasks.',
+    NULL,
+    '{"cores": 6, "threads": 12, "base_clock": "4.7 GHz", "boost_clock": "5.3 GHz", "tdp": "105W", "socket": "AM5", "cache_l3": "32 MB"}'::jsonb,
+    'AMD'
   )
 ON CONFLICT (id) DO NOTHING;
 
@@ -119,8 +150,71 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     'nvidia-geforce-rtx-4070',
     'gpu',
     'Mid-range GPU offering strong 1440p gaming performance with 12GB GDDR6X memory, DLSS 3, and excellent power efficiency for mainstream gaming builds.',
+    NULL,
     '{"vram": "12 GB GDDR6X", "cuda_cores": 5888, "base_clock": "1920 MHz", "boost_clock": "2475 MHz", "tdp": "200W", "interface": "PCIe 4.0 x16", "memory_bus": "192-bit"}'::jsonb,
     'NVIDIA'
+  ),
+  (
+    'aa4e5f6a-7b8c-9d0e-1f2a-3b4c5d6e7f8a'::uuid,
+    'NVIDIA GeForce RTX 4080',
+    'nvidia-geforce-rtx-4080',
+    'gpu',
+    'High-performance graphics card with 16GB GDDR6X memory, perfect for 4K gaming and content creation with DLSS 3 and advanced ray tracing.',
+    NULL,
+    '{"vram": "16 GB GDDR6X", "cuda_cores": 9728, "base_clock": "2205 MHz", "boost_clock": "2505 MHz", "tdp": "320W", "interface": "PCIe 4.0 x16", "memory_bus": "256-bit"}'::jsonb,
+    'NVIDIA'
+  ),
+  (
+    'bb5f6a7b-8c9d-0e1f-2a3b-4c5d6e7f8a9b'::uuid,
+    'AMD Radeon RX 7800 XT',
+    'amd-radeon-rx-7800-xt',
+    'gpu',
+    'Excellent 1440p gaming card with 16GB GDDR6 memory. Great value with strong rasterization performance and competitive pricing.',
+    NULL,
+  (
+    'b8c9d0e1-f2a3-4b5c-8d9e-0f1a2b3c4d5e'::uuid,
+    'G.Skill Trident Z5 RGB 64GB (2x32GB) 6400MHz',
+    'gskill-trident-z5-rgb-64gb-6400mhz',
+    'ram',
+    'Premium DDR5 RGB memory kit with 64GB capacity and 6400MHz speed. Features stunning RGB lighting and excellent overclocking potential for high-end builds.',
+    NULL,
+    '{"capacity": "64 GB", "type": "DDR5", "speed": "6400 MHz", "cas_latency": "CL32", "voltage": "1.4V", "form_factor": "DIMM", "kit_configuration": "2x32GB"}'::jsonb,
+    'G.Skill'
+  ),
+  (
+    'aa8c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e'::uuid,
+    'Kingston FURY Beast DDR4 16GB (2x8GB) 3200MHz',
+    'kingston-fury-beast-ddr4-16gb-3200mhz',
+    'ram',
+    'Reliable DDR4 memory kit with 16GB capacity and 3200MHz speed. Great value for budget builds with solid performance and low-profile design.',
+    NULL,
+    '{"capacity": "16 GB", "type": "DDR4", "speed": "3200 MHz", "cas_latency": "CL16", "voltage": "1.35V", "form_factor": "DIMM", "kit_configuration": "2x8GB"}'::jsonb,
+    'Kingston'
+  ),
+  (
+    'bb9d0e1f-2a3b-4c5d-6e7f-8a9b0c1d2e3f'::uuid,
+    'Corsair Dominator Platinum RGB 32GB (2x16GB) 5600MHz',
+    'corsair-dominator-platinum-rgb-32gb-5600mhz',
+    'ram',
+    'Premium DDR5 memory with stunning RGB lighting and exceptional build quality. Optimized for Intel and AMD platforms with tight timings.',
+    NULL,
+    '{"capacity": "32 GB", "type": "DDR5", "speed": "5600 MHz", "cas_latency": "CL36", "voltage": "1.25V", "form_factor": "DIMM", "kit_configuration": "2x16GB"}'::jsonb,
+    'Corsair'
+  )
+ON CONFLICT (id) DO NOTHING;440p gaming card with 8GB GDDR6 memory, DLSS 3, and excellent power efficiency for entry-level builds.',
+    NULL,
+    '{"vram": "8 GB GDDR6", "cuda_cores": 4352, "base_clock": "2310 MHz", "boost_clock": "2535 MHz", "tdp": "160W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
+    'NVIDIA'
+  ),
+  (
+    'dd7b8c9d-0e1f-2a3b-4c5d-6e7f8a9b0c1d'::uuid,
+    'AMD Radeon RX 7600',
+    'amd-radeon-rx-7600',
+    'gpu',
+    'Entry-level gaming card with 8GB GDDR6 memory, perfect for 1080p gaming at high settings with excellent value for budget builds.',
+    NULL,
+    '{"vram": "8 GB GDDR6", "stream_processors": 2048, "game_clock": "2250 MHz", "boost_clock": "2655 MHz", "tdp": "165W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
+    'AMD'
   )
 ON CONFLICT (id) DO NOTHING;
 
@@ -145,14 +239,47 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     'G.Skill Trident Z5 RGB 64GB (2x32GB) 6400MHz',
     'gskill-trident-z5-rgb-64gb-6400mhz',
     'ram',
-    '{"capacity": "64 GB", "type": "DDR5", "speed": "6400 MHz", "cas_latency": "CL32", "voltage": "1.4V", "form_factor": "DIMM", "kit_configuration": "2x32GB"}'::jsonb,
-    'G.Skill'
+  (
+    'd0e1f2a3-b4c5-4d5e-8f9a-0b1c2d3e4f5a'::uuid,
+    'WD Black SN850X 1TB NVMe SSD',
+    'wd-black-sn850x-1tb',
+    'storage',
+    'High-performance PCIe 4.0 NVMe SSD with 1TB capacity, ideal for gaming with fast load times and excellent sustained performance.',
+    NULL,
+    '{"capacity": "1 TB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "7300 MB/s", "write_speed": "6300 MB/s", "tbw": "600 TB", "dram_cache": true}'::jsonb,
+    'Western Digital'
+  ),
+  (
+    'aa0e1f2a-3b4c-5d6e-7f8a-9b0c1d2e3f4a'::uuid,
+    'Crucial P3 Plus 4TB NVMe SSD',
+    'crucial-p3-plus-4tb',
+    'storage',
+    'Large capacity PCIe 4.0 NVMe SSD offering excellent value with 4TB storage. Perfect for game libraries and media storage with solid performance.',
+    NULL,
+    '{"capacity": "4 TB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "5000 MB/s", "write_speed": "4200 MB/s", "tbw": "800 TB", "dram_cache": false}'::jsonb,
+    'Crucial'
+  ),
+  (
+    'bb1f2a3b-4c5d-6e7f-8a9b-0c1d2e3f4a5b'::uuid,
+    'Samsung 870 EVO 2TB SATA SSD',
+    'samsung-870-evo-2tb',
+    'storage',
+    'Reliable SATA SSD with 2TB capacity and excellent endurance. Great for secondary storage or upgrading older systems with SATA interfaces.',
+    NULL,
+    '{"capacity": "2 TB", "interface": "SATA III 6Gb/s", "form_factor": "2.5 inch", "read_speed": "560 MB/s", "write_speed": "530 MB/s", "tbw": "1200 TB", "dram_cache": true}'::jsonb,
+    'Samsung'
+  ),
+  (
+    'cc2a3b4c-5d6e-7f8a-9b0c-1d2e3f4a5b6c'::uuid,
+    'Kingston NV2 500GB NVMe SSD',
+    'kingston-nv2-500gb',
+    'storage',
+    'Budget-friendly NVMe SSD with 500GB capacity, perfect for OS drive in budget builds with significantly faster speeds than SATA.',
+    NULL,
+    '{"capacity": "500 GB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "3500 MB/s", "write_speed": "2100 MB/s", "tbw": "160 TB", "dram_cache": false}'::jsonb,
+    'Kingston'
   )
-ON CONFLICT (id) DO NOTHING;
-
--- ============================================================================
--- COMPUTER PARTS - Storage
--- ============================================================================
+ON CONFLICT (id) DO NOTHING;===================================================
 -- COMPUTER PARTS - Storage
 -- ============================================================================
 

@@ -8,4 +8,15 @@ export const environment = {
   searchResultLimit: 50,
   articlesPerPage: 20,
   partsPerPage: 20,
+  // Admin dashboard configuration
+  admin: {
+    sessionTimeoutMinutes: 30,
+    maxFailedLoginAttempts: 5,
+    accountLockoutMinutes: 15,
+    maxImageSizeMB: 5,
+    trashRetentionDays: 30,
+    activityLogRetentionDays: 90,
+    metricsCacheTTLMinutes: 5,
+    activityFeedRefreshSeconds: 30,
+  },
 };

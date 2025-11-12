@@ -41,35 +41,20 @@
  * Ensure content doesn't overlap with tab bar and proper contrast
  */
 
-// Only add bottom padding for pages within the tab navigation
+// Add comfortable bottom padding for pages within the tab navigation
 ion-tabs ion-content {
-  --padding-bottom: 80px !important; // Extra padding for tab bar (56px + 24px buffer)
-}
-
-// Ensure all page containers within tabs respect the bottom safe area
-ion-tabs .home-container,
-ion-tabs .topics-container,
-ion-tabs .parts-container,
-ion-tabs .search-container {
-  padding-bottom: 32px !important;
-  min-height: calc(100vh - 80px);
+  --padding-bottom: 72px; // Space for tab bar (56px) + buffer (16px)
 }
 
 // For standalone pages (outside tabs), use standard padding
 .article-detail-container,
 .settings-container {
-  padding-bottom: 32px !important;
+  padding-bottom: 32px;
 }
 
 // Ensure proper box-sizing for all elements
 * {
   box-sizing: border-box;
-}
-
-// Fix for production builds - ensure ion-content has proper overflow
-ion-content {
-  --overflow: auto;
-  overflow: auto;
 }
 
 // Ensure tab bar is properly visible

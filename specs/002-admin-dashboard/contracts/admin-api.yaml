@@ -1,0 +1,1295 @@
+openapi: 3.0.3
+info:
+  title: ICT Wiki Admin API
+  description: |
+    Admin dashboard API for ICT Wiki content management system.
+    
+    **Authentication**: All endpoints require Bearer JWT token with `role=admin` claim.
+    
+    **Base URL**: `https://your-project.supabase.co/rest/v1/`
+    
+    **Security**: Row Level Security (RLS) policies enforce admin-only access.
+  version: 1.0.0
+  contact:
+    name: ICT Wiki Dev Team
+    email: dev@ict-wiki.example.com
+
+servers:
+  - url: https://your-project.supabase.co/rest/v1
+    description: Supabase REST API
+  - url: http://localhost:54321/rest/v1
+    description: Local Supabase (development)
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Authentication
+    description: Admin login, logout, password reset
+  - name: Dashboard
+    description: Metrics and activity feed
+  - name: Articles
+    description: Article CRUD operations
+  - name: Parts
+    description: Hardware parts CRUD operations
+  - name: Categories
+    description: Category management
+  - name: Activity Logs
+    description: Audit trail queries
+  - name: Trash
+    description: Soft-deleted item recovery
+  - name: Storage
+    description: Image upload and storage metrics
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Supabase JWT token with admin role claim
+
+  schemas:
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: UNAUTHORIZED
+        message:
+          type: string
+          example: Invalid credentials
+        details:
+          type: object
+          additionalProperties: true
+
+    AdminUser:
+      type: object
+      required:
+        - id
+        - email
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [admin, super_admin]
+        failed_login_attempts:
+          type: integer
+          minimum: 0
+        locked_until:
+          type: string
+          format: date-time
+          nullable: true
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    DashboardMetrics:
+      type: object
+      required:
+        - articles_count
+        - categories_count
+        - parts_count
+        - recent_uploads_count
+        - pending_drafts_count
+        - storage_usage_percent
+        - storage_usage_bytes
+      properties:
+        articles_count:
+          type: integer
+          example: 245
+        categories_count:
+          type: integer
+          example: 12
+        parts_count:
+          type: integer
+          example: 156
+        recent_uploads_count:
+          type: integer
+          description: Articles created in last 7 days
+          example: 8
+        pending_drafts_count:
+          type: integer
+          example: 3
+        storage_usage_percent:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 42.5
+        storage_usage_bytes:
+          type: integer
+          format: int64
+          example: 2147483648
+
+    ActivityLog:
+      type: object
+      required:
+        - id
+        - created_at
+        - admin_id
+        - admin_email
+        - action_type
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        admin_id:
+          type: string
+          format: uuid
+        admin_email:
+          type: string
+          format: email
+        action_type:
+          type: string
+          enum:
+            - login_success
+            - login_failure
+            - create
+            - edit
+            - delete
+            - publish
+            - unpublish
+            - restore
+            - permanent_delete
+        item_type:
+          type: string
+          enum: [article, part, category]
+          nullable: true
+        item_id:
+          type: string
+          format: uuid
+          nullable: true
+        item_title:
+          type: string
+          nullable: true
+        ip_address:
+          type: string
+          example: "192.168.1.1"
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        notes:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    Article:
+      type: object
+      required:
+        - id
+        - title
+        - slug
+        - category_id
+        - content
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+          minLength: 1
+          maxLength: 200
+        category_id:
+          type: string
+          format: uuid
+        author_id:
+          type: string
+          format: uuid
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        cover_image:
+          type: string
+          format: uri
+          nullable: true
+        content:
+          type: string
+          description: Markdown content
+        rendered_html:
+          type: string
+          description: Cached HTML (read-only)
+          readOnly: true
+        excerpt:
+          type: string
+          maxLength: 500
+          nullable: true
+        status:
+          type: string
+          enum: [draft, published]
+          default: draft
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+
+    ArticleInput:
+      type: object
+      required:
+        - title
+        - category_id
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+          description: Auto-generated if not provided
+        category_id:
+          type: string
+          format: uuid
+        tags:
+          type: array
+          items:
+            type: string
+        cover_image:
+          type: string
+          format: uri
+        content:
+          type: string
+        excerpt:
+          type: string
+          maxLength: 500
+        status:
+          type: string
+          enum: [draft, published]
+          default: draft
+
+    Part:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        type:
+          type: string
+          example: CPU
+        brand:
+          type: string
+          nullable: true
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        specs:
+          type: object
+          additionalProperties: true
+          example:
+            CPU Speed: "3.5 GHz"
+            RAM: "16GB"
+            TDP: "65W"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+
+    PartInput:
+      type: object
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+          description: Auto-generated if not provided
+        type:
+          type: string
+        brand:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        description:
+          type: string
+          maxLength: 1000
+        specs:
+          type: object
+          additionalProperties: true
+
+    Category:
+      type: object
+      required:
+        - id
+        - name
+        - slug
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+
+    CategoryInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+          description: Auto-generated if not provided
+        description:
+          type: string
+          maxLength: 500
+
+    TrashItem:
+      type: object
+      required:
+        - item_type
+        - item_id
+        - deleted_at
+      properties:
+        item_type:
+          type: string
+          enum: [article, part, category]
+        item_id:
+          type: string
+          format: uuid
+        item_title:
+          type: string
+        deleted_at:
+          type: string
+          format: date-time
+        deleted_by:
+          type: string
+          format: email
+        auto_delete_at:
+          type: string
+          format: date-time
+          description: Permanent deletion scheduled date (deleted_at + 30 days)
+
+paths:
+  /auth/v1/token:
+    post:
+      tags:
+        - Authentication
+      summary: Admin login
+      description: Authenticate with email and password, receive JWT token
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  token_type:
+                    type: string
+                    example: bearer
+                  expires_in:
+                    type: integer
+                    example: 3600
+                  refresh_token:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/AdminUser'
+        '400':
+          description: Invalid credentials or account locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - not an admin user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/v1/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Admin logout
+      description: Invalidate current JWT token
+      operationId: logout
+      responses:
+        '204':
+          description: Logout successful
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/v1/recover:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Send password reset email to admin
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Reset email sent
+        '400':
+          description: Invalid email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /rpc/dashboard_metrics:
+    get:
+      tags:
+        - Dashboard
+      summary: Get dashboard metrics
+      description: Retrieve aggregated metrics for dashboard overview
+      operationId: getDashboardMetrics
+      responses:
+        '200':
+          description: Metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardMetrics'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /activity_logs:
+    get:
+      tags:
+        - Dashboard
+      summary: Get activity feed
+      description: Retrieve last 20 admin actions for dashboard
+      operationId: getActivityFeed
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: admin_id
+          in: query
+          description: Filter by admin user ID
+          schema:
+            type: string
+            format: uuid
+        - name: action_type
+          in: query
+          description: Filter by action type
+          schema:
+            type: string
+            enum: [login_success, login_failure, create, edit, delete, publish, unpublish, restore, permanent_delete]
+        - name: item_type
+          in: query
+          description: Filter by item type
+          schema:
+            type: string
+            enum: [article, part, category]
+      responses:
+        '200':
+          description: Activity logs retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ActivityLog'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /articles:
+    get:
+      tags:
+        - Articles
+      summary: List all articles
+      description: Get paginated list of articles with filters
+      operationId: listArticles
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: category_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published]
+        - name: title
+          in: query
+          description: Search by title (case-insensitive partial match)
+          schema:
+            type: string
+        - name: include_deleted
+          in: query
+          description: Include soft-deleted articles
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Articles retrieved successfully
+          headers:
+            Content-Range:
+              description: Pagination info (e.g., "0-24/100")
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Articles
+      summary: Create new article
+      description: Create a new article (draft or published)
+      operationId: createArticle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleInput'
+      responses:
+        '201':
+          description: Article created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Slug already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /articles/{id}:
+    get:
+      tags:
+        - Articles
+      summary: Get article by ID
+      operationId: getArticle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Article retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Articles
+      summary: Update article
+      description: Update existing article (partial update)
+      operationId: updateArticle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleInput'
+      responses:
+        '200':
+          description: Article updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Slug conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Articles
+      summary: Soft-delete article
+      description: Move article to trash (sets deleted_at timestamp)
+      operationId: deleteArticle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Article moved to trash
+        '404':
+          description: Article not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /parts:
+    get:
+      tags:
+        - Parts
+      summary: List all parts
+      description: Get paginated list of hardware parts with filters
+      operationId: listParts
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: brand
+          in: query
+          schema:
+            type: string
+        - name: name
+          in: query
+          description: Search by name (case-insensitive partial match)
+          schema:
+            type: string
+        - name: include_deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Parts retrieved successfully
+          headers:
+            Content-Range:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Part'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Parts
+      summary: Create new part
+      operationId: createPart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartInput'
+      responses:
+        '201':
+          description: Part created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /parts/{id}:
+    get:
+      tags:
+        - Parts
+      summary: Get part by ID
+      operationId: getPart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Part retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+        '404':
+          description: Part not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - Parts
+      summary: Update part
+      operationId: updatePart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartInput'
+      responses:
+        '200':
+          description: Part updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Parts
+      summary: Soft-delete part
+      operationId: deletePart
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Part moved to trash
+        '404':
+          description: Part not found
+
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: List all categories
+      operationId: listCategories
+      parameters:
+        - name: include_deleted
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+
+    post:
+      tags:
+        - Categories
+      summary: Create new category
+      operationId: createCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /categories/{id}:
+    get:
+      tags:
+        - Categories
+      summary: Get category by ID
+      operationId: getCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+        '404':
+          description: Category not found
+
+    patch:
+      tags:
+        - Categories
+      summary: Update category
+      operationId: updateCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryInput'
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+
+    delete:
+      tags:
+        - Categories
+      summary: Delete category
+      description: Soft-delete if no articles, or return error
+      operationId: deleteCategory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Category moved to trash
+        '400':
+          description: Cannot delete category with articles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                example:
+                  code: CONSTRAINT_VIOLATION
+                  message: Cannot delete category with 5 active articles
+
+  /rpc/trash_items:
+    get:
+      tags:
+        - Trash
+      summary: Get trash items
+      description: List all soft-deleted items across articles, parts, categories
+      operationId: getTrashItems
+      responses:
+        '200':
+          description: Trash items retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrashItem'
+
+  /rpc/restore_item:
+    post:
+      tags:
+        - Trash
+      summary: Restore item from trash
+      description: Set deleted_at to NULL for specified item
+      operationId: restoreItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - item_type
+                - item_id
+              properties:
+                item_type:
+                  type: string
+                  enum: [article, part, category]
+                item_id:
+                  type: string
+                  format: uuid
+      responses:
+        '204':
+          description: Item restored successfully
+        '404':
+          description: Item not found in trash
+
+  /rpc/permanent_delete:
+    post:
+      tags:
+        - Trash
+      summary: Permanently delete item
+      description: Actual DELETE from database (irreversible)
+      operationId: permanentDelete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - item_type
+                - item_id
+              properties:
+                item_type:
+                  type: string
+                  enum: [article, part, category]
+                item_id:
+                  type: string
+                  format: uuid
+      responses:
+        '204':
+          description: Item permanently deleted
+        '404':
+          description: Item not found
+
+  /storage/v1/object/{bucket}/{path}:
+    post:
+      tags:
+        - Storage
+      summary: Upload image
+      description: Upload image to Supabase Storage
+      operationId: uploadImage
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [articles, parts]
+        - name: path
+          in: path
+          required: true
+          description: File path/name (e.g., "2025/11/image.jpg")
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Key:
+                    type: string
+                    example: "articles/2025/11/image.jpg"
+                  Id:
+                    type: string
+                  created_at:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid file type or size
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Storage
+      summary: Delete image
+      operationId: deleteImage
+      parameters:
+        - name: bucket
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [articles, parts]
+        - name: path
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Image deleted successfully
+        '404':
+          description: Image not found

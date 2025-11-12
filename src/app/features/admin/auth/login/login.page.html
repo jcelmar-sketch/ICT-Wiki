@@ -1,0 +1,98 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/tabs/home">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Admin Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="login-content">
+  <div class="login-container">
+    <!-- Header -->
+    <div class="login-header">
+      <ion-icon name="shield-checkmark" class="login-icon"></ion-icon>
+      <h1>ICT Wiki Admin</h1>
+      <p class="subtitle">Sign in to manage content</p>
+    </div>
+
+    <!-- Login Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Error Alert -->
+      <ion-card *ngIf="errorMessage" class="error-alert" color="danger">
+        <ion-card-content>
+          <ion-icon name="alert-circle" slot="start"></ion-icon>
+          <span>{{ errorMessage }}</span>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Email Field -->
+      <ion-item lines="full" [class.ion-invalid]="hasError('email', 'required') || hasError('email', 'email')">
+        <ion-label position="floating">Email</ion-label>
+        <ion-input
+          type="email"
+          formControlName="email"
+          placeholder="admin@example.com"
+          autocomplete="email"
+          [clearInput]="true"
+          aria-label="Email address"
+          aria-required="true"
+        ></ion-input>
+        <ion-note slot="error" *ngIf="hasError('email', 'required')">
+          Email is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="hasError('email', 'email')">
+          Please enter a valid email
+        </ion-note>
+      </ion-item>
+
+      <!-- Password Field -->
+      <ion-item lines="full" [class.ion-invalid]="hasError('password', 'required') || hasError('password', 'minlength')">
+        <ion-label position="floating">Password</ion-label>
+        <ion-input
+          type="password"
+          formControlName="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+          [clearInput]="true"
+          aria-label="Password"
+          aria-required="true"
+        ></ion-input>
+        <ion-note slot="error" *ngIf="hasError('password', 'required')">
+          Password is required
+        </ion-note>
+        <ion-note slot="error" *ngIf="hasError('password', 'minlength')">
+          Password must be at least 8 characters
+        </ion-note>
+      </ion-item>
+
+      <!-- Forgot Password Link -->
+      <div class="forgot-password">
+        <ion-button 
+          fill="clear" 
+          size="small" 
+          (click)="goToForgotPassword()"
+          aria-label="Forgot password"
+        >
+          Forgot password?
+        </ion-button>
+      </div>
+
+      <!-- Submit Button -->
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="loading"
+        class="login-button"
+        aria-label="Sign in to admin dashboard"
+      >
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+        <span *ngIf="!loading">Sign In</span>
+      </ion-button>
+    </form>
+
+    <!-- Footer -->
+  </div>
+</ion-content>

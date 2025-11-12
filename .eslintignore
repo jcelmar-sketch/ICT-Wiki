@@ -1,0 +1,29 @@
+# ESLint ignore patterns for ICT-Wiki
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+www/
+out-tsc/
+.angular/
+bazel-out/
+
+# Coverage
+coverage/
+
+# Minified files
+*.min.js
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Generated files
+*.d.ts
+
+# Third-party
+public/

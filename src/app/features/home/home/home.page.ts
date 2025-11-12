@@ -12,6 +12,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { ArticlesService } from '../../articles/articles.service';
 import { ArticleCard } from '../../../core/models/article.model';
@@ -25,6 +26,7 @@ import { SkeletonLoaderComponent } from '../../../shared/components/skeleton-loa
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     IonicModule,
     ArticleCardComponent,
     SkeletonLoaderComponent,

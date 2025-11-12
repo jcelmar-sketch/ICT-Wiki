@@ -1,0 +1,137 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="dashboard-container">
+    <!-- Storage Warning Alert (FR-009) -->
+    <ion-card *ngIf="storageWarning" color="warning" class="warning-card">
+      <ion-card-content>
+        <div class="warning-content">
+          <ion-icon name="warning-outline" class="warning-icon"></ion-icon>
+          <div>
+            <strong>Storage Warning</strong>
+            <p>Storage usage is at {{ metrics.storagePercentage }}%. Consider deleting old files.</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Quick Actions (FR-010) -->
+    <div class="quick-actions">
+      <ion-button expand="block" routerLink="/admin/articles/create" color="primary">
+        <ion-icon slot="start" name="document-text-outline"></ion-icon>
+        Create Article
+      </ion-button>
+      <ion-button expand="block" routerLink="/admin/parts/create" color="primary">
+        <ion-icon slot="start" name="hardware-chip-outline"></ion-icon>
+        Create Part
+      </ion-button>
+      <ion-button expand="block" routerLink="/admin/categories/create" color="primary">
+        <ion-icon slot="start" name="folder-outline"></ion-icon>
+        Create Topic
+      </ion-button>
+    </div>
+
+    <!-- Metrics Grid (FR-007) -->
+    <div class="metrics-grid">
+      <ion-card class="metric-card">
+        <ion-card-content>
+          <div class="metric-icon" style="background-color: var(--ion-color-primary-tint);">
+            <ion-icon name="document-text-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.totalArticles }}</div>
+          <div class="metric-label">Total Articles</div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="metric-card">
+        <ion-card-content>
+          <div class="metric-icon" style="background-color: var(--ion-color-secondary-tint);">
+            <ion-icon name="folder-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.totalTopics }}</div>
+          <div class="metric-label">Topics</div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="metric-card">
+        <ion-card-content>
+          <div class="metric-icon" style="background-color: var(--ion-color-tertiary-tint);">
+            <ion-icon name="hardware-chip-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.totalParts }}</div>
+          <div class="metric-label">Computer Parts</div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="metric-card">
+        <ion-card-content>
+          <div class="metric-icon" style="background-color: var(--ion-color-success-tint);">
+            <ion-icon name="cloud-upload-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.recentUploads }}</div>
+          <div class="metric-label">Recent (7 days)</div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="metric-card">
+        <ion-card-content>
+          <div class="metric-icon" style="background-color: var(--ion-color-warning-tint);">
+            <ion-icon name="document-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.pendingDrafts }}</div>
+          <div class="metric-label">Pending Drafts</div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="metric-card" [class.storage-warning]="storageWarning">
+        <ion-card-content>
+          <div class="metric-icon" [style.background-color]="storageWarning ? 'var(--ion-color-danger-tint)' : 'var(--ion-color-medium-tint)'">
+            <ion-icon name="server-outline" class="white-icon"></ion-icon>
+          </div>
+          <div class="metric-value">{{ metrics.storagePercentage }}%</div>
+          <div class="metric-label">Storage Used</div>
+          <div class="metric-detail">{{ formatBytes(metrics.storageUsed) }} / {{ formatBytes(metrics.storageQuota) }}</div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Activity Feed (FR-008) -->
+    <ion-card class="activity-card">
+      <ion-card-header>
+        <ion-card-title>Recent Activity</ion-card-title>
+        <ion-card-subtitle>Last 20 actions • Updates every 30 seconds</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list *ngIf="activities.length > 0; else noActivity">
+          <ion-item *ngFor="let activity of activities" lines="inset">
+            <ion-icon slot="start" [name]="getActionIcon(activity.action_type)"></ion-icon>
+            <ion-label>
+              <h3>{{ formatActionType(activity.action_type) }}</h3>
+              <p *ngIf="activity.item_title">
+                {{ activity.item_type }}: {{ activity.item_title }}
+              </p>
+              <p class="activity-meta">
+                <span>{{ activity.admin_email }}</span>
+                <span class="timestamp">{{ formatTimestamp(activity.timestamp) }}</span>
+              </p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+        <ng-template #noActivity>
+          <div class="empty-state">
+            <ion-icon name="list-outline" class="empty-icon"></ion-icon>
+            <p>No activity yet</p>
+          </div>
+        </ng-template>
+        <ion-button expand="block" fill="clear" routerLink="/admin/activity" class="view-all-btn">
+          View All Activity
+          <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
