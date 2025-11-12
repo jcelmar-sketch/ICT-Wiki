@@ -53,10 +53,10 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [x] T012 Create RoleGuard in `src/app/core/guards/role.guard.ts` to verify admin role claim from JWT
 - [x] T013 Create ActivityLogService in `src/app/core/services/activity-log.service.ts` with log(), getRecentActivity(), filter() methods
 - [x] T014 Create AdminApiService base in `src/app/core/services/admin-api.service.ts` with common CRUD methods and error handling
-- [ ] T015 [P] Extend SupabaseService in `src/app/core/services/supabase.service.ts` to expose admin auth methods
-- [SKIP] T016 [P] Unit test AdminAuthService in `src/app/core/services/admin-auth.service.spec.ts` covering login success/failure, lockout, session expiry
-- [SKIP] T017 [P] Unit test AdminAuthGuard in `src/app/core/guards/admin-auth.guard.spec.ts` covering redirect scenarios
-- [SKIP] T018 [P] Unit test ActivityLogService in `src/app/core/services/activity-log.service.spec.ts` covering log creation and filtering
+- [x] T015 [P] Extend SupabaseService in `src/app/core/services/supabase.service.ts` to expose admin auth methods
+- [ ] T016 [P] Unit test AdminAuthService in `src/app/core/services/admin-auth.service.spec.ts` covering login success/failure, lockout, session expiry, session timeout detection, localStorage preservation
+- [ ] T017 [P] Unit test AdminAuthGuard in `src/app/core/guards/admin-auth.guard.spec.ts` covering redirect scenarios (unauthenticated → /admin/login, authenticated → allow, expired session → /admin/login with returnUrl)
+- [ ] T018 [P] Unit test ActivityLogService in `src/app/core/services/activity-log.service.spec.ts` covering log creation, filtering by admin/action/date, pagination, error handling
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,11 +83,13 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [x] T026 [P] [US1] Create ForgotPasswordPage template in `src/app/features/admin/auth/forgot-password/forgot-password.page.html`
 - [x] T027 [US1] Implement login logic in LoginPage: form submission, validation, AdminAuthService.login() call, error handling, redirect to dashboard
 - [x] T028 [US1] Implement session timeout detection: use RxJS interval to check session expiry every 60 seconds, preserve form data in localStorage on expiry using key format `admin_form_{formType}_{itemId}` with JSON value `{formData: {...}, savedAt: timestamp, expiresAt: timestamp + 24h}`. Restore data after re-login, clear on explicit logout
+- [ ] T028a [US1] Unit test for localStorage form preservation in `src/app/core/services/admin-auth.service.spec.ts` covering: form data saved with 24h expiry, data restored after re-login, expired data purged, sensitive fields (password) excluded, localStorage cleared on explicit logout
 - [x] T029 [US1] Implement account lockout UI: show lockout message when AdminAuthService returns locked error, display countdown timer
 - [x] T030 [US1] Implement forgot password logic in ForgotPasswordPage: call Supabase Auth recover endpoint, show success message
+- [ ] T030a [US1] Integration test for forgot password flow in `src/app/features/admin/auth/forgot-password/forgot-password.page.spec.ts` covering: email sent successfully, invalid email error, rate limiting (max 3 per hour)
 - [x] T031 [US1] Add logout button to admin header (implement in Phase 4 US2 when header is created)
-- [ ] T032 [US1] Update `docs/user-guide.md` adding "Admin Authentication" section with login workflow, lockout rules, password reset
-- [ ] T033 [US1] Create ADR-003 in `docs/adr/003-admin-authentication-strategy.md` documenting email/password choice, session timeout, lockout logic
+- [x] T032 [US1] Update `docs/user-guide.md` adding "Admin Authentication" section with login workflow, lockout rules, password reset
+- [x] T033 [US1] Create ADR-003 in `docs/adr/003-admin-authentication-strategy.md` documenting email/password choice, session timeout, lockout logic
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Admins can log in and access protected routes.
 
@@ -107,20 +109,20 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 2
 
-- [ ] T037 [P] [US2] Create DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.ts` with getMetrics(), getActivityFeed() using RxJS ReplaySubject cache
+- [x] T037 [P] [US2] Create DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.ts` with getMetrics(), getActivityFeed() using RxJS ReplaySubject cache
 - [ ] T038 [P] [US2] Unit test DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.spec.ts` covering cache TTL, activity polling
-- [ ] T039 [P] [US2] Create DashboardPage component in `src/app/features/admin/dashboard/dashboard.page.ts` with metrics$ and activityFeed$ observables
-- [ ] T040 [P] [US2] Create MetricCardComponent in `src/app/features/admin/shared/metric-card/metric-card.component.ts` as reusable card with label, value, icon, warning state
-- [ ] T041 [P] [US2] Create AdminHeaderComponent in `src/app/features/admin/shared/header/header.component.ts` with admin email display and logout button
-- [ ] T042 [P] [US2] Create AdminSidebarComponent in `src/app/features/admin/shared/sidebar/sidebar.component.ts` with navigation menu items
-- [ ] T043 [US2] Create DashboardPage template in `src/app/features/admin/dashboard/dashboard.page.html` with 6 metric-card components and activity feed list
-- [ ] T044 [US2] Create DashboardPage styles in `src/app/features/admin/dashboard/dashboard.page.scss` with CSS Grid layout for metric cards
-- [ ] T045 [US2] Implement admin layout wrapper using ion-split-pane in `src/app/features/admin/admin-layout.component.ts` with responsive sidebar (desktop: persistent, mobile: drawer)
-- [ ] T046 [US2] Implement storage usage warning: if usage > 80%, add warning class to storage metric card and show alert banner on dashboard
-- [ ] T047 [US2] Implement quick action buttons: "Create Article", "Create Part", "Create Category" routing to respective create pages
-- [ ] T048 [US2] Connect logout button in AdminHeaderComponent to AdminAuthService.logout() and redirect to login page
-- [ ] T049 [US2] Update `docs/user-guide.md` adding "Dashboard Overview" section explaining metric meanings, activity feed, quick actions
-- [ ] T050 [US2] Update `docs/architecture.md` documenting metrics caching strategy (5-min ReplaySubject), activity feed polling (30-sec interval)
+- [x] T039 [P] [US2] Create DashboardPage component in `src/app/features/admin/dashboard/dashboard.page.ts` with metrics$ and activityFeed$ observables
+- [x] T040 [P] [US2] Create MetricCardComponent in `src/app/features/admin/shared/metric-card/metric-card.component.ts` as reusable card with label, value, icon, warning state
+- [x] T041 [P] [US2] Create AdminHeaderComponent in `src/app/features/admin/shared/header/header.component.ts` with admin email display and logout button
+- [x] T042 [P] [US2] Create AdminSidebarComponent in `src/app/features/admin/shared/sidebar/sidebar.component.ts` with navigation menu items
+- [x] T043 [US2] Create DashboardPage template in `src/app/features/admin/dashboard/dashboard.page.html` with 6 metric-card components and activity feed list
+- [x] T044 [US2] Create DashboardPage styles in `src/app/features/admin/dashboard/dashboard.page.scss` with CSS Grid layout for metric cards
+- [x] T045 [US2] Implement admin layout wrapper using ion-split-pane in `src/app/features/admin/admin-layout.component.ts` with responsive sidebar (desktop: persistent, mobile: drawer)
+- [x] T046 [US2] Implement storage usage warning: if usage > 80%, add warning class to storage metric card and show alert banner on dashboard
+- [x] T047 [US2] Implement quick action buttons: "Create Article", "Create Part", "Create Category" routing to respective create pages
+- [x] T048 [US2] Connect logout button in AdminHeaderComponent to AdminAuthService.logout() and redirect to login page
+- [x] T049 [US2] Update `docs/user-guide.md` adding "Dashboard Overview" section explaining metric meanings, activity feed, quick actions
+- [x] T050 [US2] Update `docs/architecture.md` documenting metrics caching strategy (5-min ReplaySubject), activity feed polling (30-sec interval)
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently. Admins can log in and view dashboard with live metrics.
 
@@ -140,28 +142,29 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 3
 
-- [ ] T054 [P] [US3] Extend Article model in `src/app/core/models/article.model.ts` to add author_id, status, deleted_at fields
-- [ ] T055 [P] [US3] Create ArticlesAdminService in `src/app/core/services/articles-admin.service.ts` with list(), get(), create(), update(), softDelete(), restore() methods
+- [x] T054 [P] [US3] Extend Article model in `src/app/core/models/article.model.ts` to add author_id, status, deleted_at fields
+- [x] T055 [P] [US3] Create ArticlesAdminService in `src/app/core/services/articles-admin.service.ts` with list(), get(), create(), update(), softDelete(), restore() methods
 - [ ] T056 [P] [US3] Unit test ArticlesAdminService in `src/app/core/services/articles-admin.service.spec.ts` covering CRUD operations and error handling
-- [ ] T057 [P] [US3] Create ArticleListPage component in `src/app/features/admin/articles/list/article-list.page.ts` with filters (category, status, search) and pagination
-- [ ] T058 [P] [US3] Create ArticleListPage template in `src/app/features/admin/articles/list/article-list.page.html` with ion-searchbar, filter selects, article cards, pagination
-- [ ] T059 [P] [US3] Create ArticleFormPage component in `src/app/features/admin/articles/create/article-form.page.ts` with reactive form (title, slug, category, tags, content, status)
-- [ ] T060 [P] [US3] Create MarkdownEditorComponent in `src/app/features/admin/articles/components/markdown-editor/markdown-editor.component.ts` with textarea and live preview pane
-- [ ] T061 [P] [US3] Create ImageUploadComponent in `src/app/features/admin/articles/components/image-upload/image-upload.component.ts` with drag-drop, progress bar, preview
-- [ ] T062 [US3] Create ArticleFormPage template in `src/app/features/admin/articles/create/article-form.page.html` with all form fields, markdown-editor, image-upload components
-- [ ] T063 [US3] Implement slug auto-generation: watch title field changes, transform to lowercase-hyphenated slug, allow manual override
-- [ ] T064 [US3] Implement form validation: title required, slug unique check, category required, markdown content required, show inline error messages
-- [ ] T065 [US3] Implement markdown preview: pipe content through MarkdownPipe and DOMPurify, update preview pane on debounced input (300ms)
-- [ ] T066 [US3] Implement image upload: validate file type/size client-side, upload to Supabase Storage articles bucket, show progress, return public URL
-- [ ] T066a [US3] Implement storage quota enforcement in ImageUploadComponent: Query storage_metrics before upload attempt, if usage_percent >= 100 reject upload and show error toast "Storage quota exceeded. Please delete unused files or contact administrator.", link to storage metrics on dashboard
-- [ ] T067 [US3] Implement article save: call ArticlesAdminService.create(), handle validation errors, show success toast, redirect to article list
-- [ ] T068 [US3] Create ArticleEditPage component in `src/app/features/admin/articles/edit/article-edit.page.ts` reusing ArticleFormPage logic, pre-populate fields from route param ID
-- [ ] T069 [US3] Implement soft-delete confirmation modal: require typing "DELETE", call ArticlesAdminService.softDelete(), show success message "Article moved to Trash"
-- [ ] T070 [US3] Implement concurrent edit detection: store article.updated_at timestamp in component on form load, compare with fresh database value before save. If timestamps differ, show conflict modal with: (1) "View Changes" button with field-by-field diff, (2) "Overwrite" button with confirmation showing other admin email and timestamp, (3) "Cancel" button to reload fresh data
-- [ ] T071 [US3] Add article management routes to `src/app/app.routes.ts` under /admin/articles (list, create, edit/:id)
-- [ ] T072 [US3] Update `docs/user-guide.md` adding "Article Management" section with create/edit/delete workflows, markdown tips, slug best practices
-- [ ] T073 [US3] Create ADR-004 in `docs/adr/004-markdown-sanitization.md` documenting DOMPurify configuration, allowed tags, XSS prevention
-- [ ] T074 [US3] Update `docs/data-schema.md` adding article schema extensions (author_id, status, deleted_at columns)
+- [x] T057 [P] [US3] Create ArticleListPage component in `src/app/features/admin/articles/list/article-list.page.ts` with filters (category, status, search) and pagination
+- [x] T058 [P] [US3] Create ArticleListPage template in `src/app/features/admin/articles/list/article-list.page.html` with ion-searchbar, filter selects, article cards, pagination
+- [x] T059 [P] [US3] Create ArticleFormPage component in `src/app/features/admin/articles/create/article-form.page.ts` with reactive form (title, slug, category, tags, content, status)
+- [x] T060 [P] [US3] Create MarkdownEditorComponent in `src/app/features/admin/articles/components/markdown-editor/markdown-editor.component.ts` with textarea and live preview pane
+- [x] T061 [P] [US3] Create ImageUploadComponent in `src/app/features/admin/articles/components/image-upload/image-upload.component.ts` with drag-drop, progress bar, preview
+- [x] T062 [US3] Create ArticleFormPage template in `src/app/features/admin/articles/create/article-form.page.html` with all form fields, markdown-editor, image-upload components
+- [x] T063 [US3] Implement slug auto-generation: watch title field changes, transform to lowercase-hyphenated slug, allow manual override
+- [x] T064 [US3] Implement form validation: title required, slug unique check, category required, markdown content required, show inline error messages
+- [x] T065 [US3] Implement markdown preview: pipe content through MarkdownPipe and DOMPurify, update preview pane on debounced input (300ms)
+- [x] T066 [US3] Implement image upload: validate file type/size client-side, upload to Supabase Storage articles bucket, show progress, return public URL
+- [x] T066a [US3] Implement storage quota enforcement in ImageUploadComponent: Query storage_metrics before upload attempt, if usage_percent >= 100 reject upload and show error toast "Storage quota exceeded. Please delete unused files or contact administrator.", link to storage metrics on dashboard
+- [x] T067 [US3] Implement article save: call ArticlesAdminService.create(), handle validation errors, show success toast, redirect to article list
+- [x] T068 [US3] Create ArticleEditPage component in `src/app/features/admin/articles/edit/article-edit.page.ts` reusing ArticleFormPage logic, pre-populate fields from route param ID
+- [x] T069 [US3] Implement soft-delete confirmation modal: require typing "DELETE", call ArticlesAdminService.softDelete(), show success message "Article moved to Trash"
+- [x] T070 [US3] Implement concurrent edit detection: store article.updated_at timestamp in component on form load, compare with fresh database value before save. If timestamps differ, show conflict modal with: (1) "View Changes" button with field-by-field diff, (2) "Overwrite" button with confirmation showing other admin email and timestamp, (3) "Cancel" button to reload fresh data
+- [x] T071 [US3] Add article management routes to `src/app/app.routes.ts` under /admin/articles (list, create, edit/:id)
+- [x] T072 [US3] Update `docs/user-guide.md` adding "Article Management" section with create/edit/delete workflows, markdown tips, slug best practices
+- [x] T073 [US3] Create ADR-004 in `docs/adr/004-markdown-sanitization.md` documenting DOMPurify configuration, allowed tags, XSS prevention
+- [ ] T073a [US3] Security test for markdown sanitization in `src/app/features/admin/articles/components/markdown-editor/markdown-editor.component.spec.ts` covering: XSS prevention with malicious script tags, dangerous attributes (onerror, onclick) stripped, safe HTML preserved (headings, links, code blocks, lists), DOMPurify configuration matches public app
+- [x] T074 [US3] Update `docs/data-schema.md` adding article schema extensions (author_id, status, deleted_at columns)
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently. Admin dashboard has full article management capability - this is a shippable MVP!
 
@@ -175,67 +178,67 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Tests for User Story 4
 
-- [ ] T075 [P] [US4] Integration test for part CRUD in `src/app/features/admin/parts/parts.spec.ts` covering create with specs, edit, delete flow
-- [ ] T076 [P] [US4] Accessibility check for parts forms: specs editor keyboard navigation, multi-image upload progress, screen reader support for dynamic fields
-- [ ] T077 [P] [US4] Performance benchmark: Part creation p95 < 2000ms excluding image uploads (document results)
+- [~] T075 [P] [US4] Integration test for part CRUD in `src/app/features/admin/parts/parts.spec.ts` covering create with specs, edit, delete flow (SKIPPED per user directive)
+- [~] T076 [P] [US4] Accessibility check for parts forms: specs editor keyboard navigation, multi-image upload progress, screen reader support for dynamic fields (SKIPPED per user directive)
+- [~] T077 [P] [US4] Performance benchmark: Part creation p95 < 2000ms excluding image uploads (document results) (SKIPPED per user directive)
 
 ### Implementation for User Story 4
 
-- [ ] T078 [P] [US4] Extend Part model in `src/app/core/models/part.model.ts` to add deleted_at field and PartSpecs type definition
-- [ ] T079 [P] [US4] Create PartsAdminService in `src/app/core/services/parts-admin.service.ts` with list(), get(), create(), update(), softDelete(), restore() methods
-- [ ] T080 [P] [US4] Unit test PartsAdminService in `src/app/core/services/parts-admin.service.spec.ts` covering CRUD and specs validation
-- [ ] T081 [P] [US4] Create PartListPage component in `src/app/features/admin/parts/list/part-list.page.ts` with filters (type, brand, search) and pagination
-- [ ] T082 [P] [US4] Create PartListPage template in `src/app/features/admin/parts/list/part-list.page.html` with filter dropdowns and part cards
-- [ ] T083 [P] [US4] Create PartFormPage component in `src/app/features/admin/parts/create/part-form.page.ts` with reactive form (name, slug, type, brand, description, specs)
-- [ ] T084 [P] [US4] Create SpecsEditorComponent in `src/app/features/admin/parts/components/specs-editor/specs-editor.component.ts` with predefined fields (CPU Speed, RAM, TDP) + dynamic custom fields
-- [ ] T085 [P] [US4] Create MultiImageUploadComponent in `src/app/features/admin/parts/components/multi-image-upload/multi-image-upload.component.ts` supporting multiple files, reorder, remove
-- [ ] T086 [US4] Create PartFormPage template in `src/app/features/admin/parts/create/part-form.page.html` with specs-editor and multi-image-upload components
-- [ ] T087 [US4] Implement specs editor predefined fields: create optional form controls for common hardware specs (CPU Speed, Cores, Threads, Base Clock, Boost Clock, TDP, RAM Size, RAM Type, RAM Speed, Storage Capacity, Storage Type, GPU Model, VRAM, Interface) with text input validators (non-empty if filled)
-- [ ] T088 [US4] Implement specs editor custom fields: FormArray allowing add/remove key-value pairs, validate uniqueness of keys, prevent empty values
-- [ ] T089 [US4] Implement multi-image upload: allow selecting multiple files, upload each to Supabase Storage parts bucket, show individual progress bars, store URLs in array
-- [ ] T090 [US4] Implement part save: transform specs editor output to JSONB format, call PartsAdminService.create(), handle errors, redirect to part list
-- [ ] T091 [US4] Create PartEditPage component in `src/app/features/admin/parts/edit/part-edit.page.ts` reusing PartFormPage logic, pre-populate specs editor from JSONB
-- [ ] T092 [US4] Implement part soft-delete: show confirmation modal, call PartsAdminService.softDelete(), remove from public catalog
-- [ ] T093 [US4] Add parts management routes to `src/app/app.routes.ts` under /admin/parts (list, create, edit/:id)
-- [ ] T094 [US4] Update `docs/user-guide.md` adding "Parts Management" section with specs editor usage, image best practices
-- [ ] T095 [US4] Create ADR-005 in `docs/adr/005-part-specs-data-model.md` documenting JSONB structure, predefined fields list (CPU Speed, Cores, Threads, Base Clock, Boost Clock, TDP, RAM Size, RAM Type, RAM Speed, Storage Capacity, Storage Type, GPU Model, VRAM, Interface), validation rules (non-empty string keys/values, no duplicates), extensibility rationale (custom fields support)
-- [ ] T096 [US4] Update `docs/data-schema.md` documenting part specs JSONB schema with example values
+- [x] T078 [P] [US4] Extend Part model in `src/app/core/models/part.model.ts` to add deleted_at field and PartSpecs type definition
+- [x] T079 [P] [US4] Create PartsAdminService in `src/app/core/services/parts-admin.service.ts` with list(), get(), create(), update(), softDelete(), restore() methods
+- [~] T080 [P] [US4] Unit test PartsAdminService in `src/app/core/services/parts-admin.service.spec.ts` covering CRUD and specs validation (SKIPPED per user directive)
+- [x] T081 [P] [US4] Create PartListPage component in `src/app/features/admin/parts/list/part-list.page.ts` with filters (type, brand, search) and pagination
+- [x] T082 [P] [US4] Create PartListPage template in `src/app/features/admin/parts/list/part-list.page.html` with filter dropdowns and part cards
+- [x] T083 [P] [US4] Create PartFormPage component in `src/app/features/admin/parts/create/part-form.page.ts` with reactive form (name, slug, type, brand, description, specs)
+- [x] T084 [P] [US4] Create SpecsEditorComponent in `src/app/features/admin/parts/components/specs-editor/specs-editor.component.ts` with predefined fields (CPU Speed, RAM, TDP) + dynamic custom fields
+- [x] T085 [P] [US4] Create MultiImageUploadComponent in `src/app/features/admin/parts/components/multi-image-upload/multi-image-upload.component.ts` supporting multiple files, reorder, remove
+- [x] T086 [US4] Create PartFormPage template in `src/app/features/admin/parts/create/part-form.page.html` with specs-editor and multi-image-upload components
+- [x] T087 [US4] Implement specs editor predefined fields: create optional form controls for common hardware specs (CPU Speed, Cores, Threads, Base Clock, Boost Clock, TDP, RAM Size, RAM Type, RAM Speed, Storage Capacity, Storage Type, GPU Model, VRAM, Interface) with text input validators (non-empty if filled)
+- [x] T088 [US4] Implement specs editor custom fields: FormArray allowing add/remove key-value pairs, validate uniqueness of keys, prevent empty values
+- [x] T089 [US4] Implement multi-image upload: allow selecting multiple files, upload each to Supabase Storage parts bucket, show individual progress bars, store URLs in array
+- [x] T090 [US4] Implement part save: transform specs editor output to JSONB format, call PartsAdminService.create(), handle errors, redirect to part list
+- [x] T091 [US4] Create PartEditPage component in `src/app/features/admin/parts/edit/part-edit.page.ts` reusing PartFormPage logic, pre-populate specs editor from JSONB
+- [x] T092 [US4] Implement part soft-delete: show confirmation modal, call PartsAdminService.softDelete(), remove from public catalog
+- [x] T093 [US4] Add parts management routes to `src/app/app.routes.ts` under /admin/parts (list, create, edit/:id)
+- [x] T094 [US4] Update `docs/user-guide.md` adding "Parts Management" section with specs editor usage, image best practices
+- [x] T095 [US4] Create ADR-005 in `docs/adr/005-part-specs-data-model.md` documenting JSONB structure, predefined fields list (CPU Speed, Cores, Threads, Base Clock, Boost Clock, TDP, RAM Size, RAM Type, RAM Speed, Storage Capacity, Storage Type, GPU Model, VRAM, Interface), validation rules (non-empty string keys/values, no duplicates), extensibility rationale (custom fields support)
+- [x] T096 [US4] Update `docs/data-schema.md` documenting part specs JSONB schema with example values
 
 **Checkpoint**: At this point, User Stories 1-4 should all work independently. Parts catalog management is complete.
 
 ---
 
-## Phase 7: User Story 5 - Category Management (Priority: P2)
+## Phase 7: User Story 5 - Topic Management (Priority: P2)
 
-**Goal**: CRUD for flat categories including list with article counts, create/edit forms, delete protection when categories have articles
+**Goal**: CRUD for flat topics including list with article counts, create/edit forms, delete protection when topics have articles
 
-**Independent Test**: Navigate to Categories → see list with article counts. Create category "Graphics Cards" → slug auto-generated "graphics-cards". Assign articles to category. Try to delete category → blocked with warning. Reassign articles → delete succeeds.
+**Independent Test**: Navigate to Topics → see list with article counts. Create topic "Graphics Cards" → slug auto-generated "graphics-cards". Assign articles to topic. Try to delete topic → blocked with warning. Reassign articles → delete succeeds.
 
 ### Tests for User Story 5
 
-- [ ] T097 [P] [US5] Integration test for category CRUD in `src/app/features/admin/categories/categories.spec.ts` covering create, edit, delete protection, reassignment
-- [ ] T098 [P] [US5] Accessibility check for category forms: keyboard navigation, clear error messages, delete confirmation accessibility
-- [ ] T099 [P] [US5] Performance benchmark: Category operations p95 < 500ms (document results)
+- [ ] T097 [P] [US5] Integration test for topic CRUD in `src/app/features/admin/topics/topics.spec.ts` covering create, edit, delete protection, reassignment
+- [ ] T098 [P] [US5] Accessibility check for topic forms: keyboard navigation, clear error messages, delete confirmation accessibility
+- [ ] T099 [P] [US5] Performance benchmark: Topic operations p95 < 500ms (document results)
 
 ### Implementation for User Story 5
 
-- [ ] T100 [P] [US5] Extend Category model in `src/app/core/models/category.model.ts` to add deleted_at field and article_count property
-- [ ] T101 [P] [US5] Create CategoriesAdminService in `src/app/core/services/categories-admin.service.ts` with list(), get(), create(), update(), delete(), checkArticleCount() methods
-- [ ] T102 [P] [US5] Unit test CategoriesAdminService in `src/app/core/services/categories-admin.service.spec.ts` covering delete protection logic
-- [ ] T103 [P] [US5] Create CategoryListPage component in `src/app/features/admin/categories/list/category-list.page.ts` displaying all categories with article counts
-- [ ] T104 [P] [US5] Create CategoryListPage template in `src/app/features/admin/categories/list/category-list.page.html` with category table/cards
-- [ ] T105 [P] [US5] Create CategoryFormPage component in `src/app/features/admin/categories/edit/category-form.page.ts` with reactive form (name, slug, description)
-- [ ] T106 [US5] Create CategoryFormPage template in `src/app/features/admin/categories/edit/category-form.page.html` with name and slug inputs
-- [ ] T107 [US5] Implement category slug auto-generation: watch name field, transform to slug, allow manual override, check uniqueness
-- [ ] T108 [US5] Implement category save: call CategoriesAdminService.create() or update(), show success toast, refresh category list
-- [ ] T109 [US5] Implement delete protection: call checkArticleCount() before delete, if count > 0 show modal "This category contains X articles. Reassign or confirm deletion"
-- [ ] T110 [US5] Implement article reassignment UI in delete modal: dropdown to select target category, button to reassign all articles, then delete category
-- [ ] T111 [US5] Implement category permanent delete: show confirmation modal requiring "PERMANENT DELETE" typed, call CategoriesAdminService.delete(), remove from all dropdowns
-- [ ] T112 [US5] Add categories management routes to `src/app/app.routes.ts` under /admin/categories (list, create, edit/:id)
-- [ ] T113 [US5] Update `docs/user-guide.md` adding "Category Management" section with reassignment workflow, flat structure clarification
-- [ ] T114 [US5] Update `docs/data-schema.md` documenting category cascade rules and delete protection trigger
+- [ ] T100 [P] [US5] Extend Topic model in `src/app/core/models/topic.model.ts` to add deleted_at field and article_count property
+- [ ] T101 [P] [US5] Create TopicsAdminService in `src/app/core/services/topics-admin.service.ts` with list(), get(), create(), update(), delete(), checkArticleCount() methods
+- [ ] T102 [P] [US5] Unit test TopicsAdminService in `src/app/core/services/topics-admin.service.spec.ts` covering delete protection logic
+- [ ] T103 [P] [US5] Create TopicListPage component in `src/app/features/admin/topics/list/topic-list.page.ts` displaying all topics with article counts
+- [ ] T104 [P] [US5] Create TopicListPage template in `src/app/features/admin/topics/list/topic-list.page.html` with topic table/cards
+- [ ] T105 [P] [US5] Create TopicFormPage component in `src/app/features/admin/topics/edit/topic-form.page.ts` with reactive form (name, slug, description)
+- [ ] T106 [US5] Create TopicFormPage template in `src/app/features/admin/topics/edit/topic-form.page.html` with name and slug inputs
+- [ ] T107 [US5] Implement topic slug auto-generation: watch name field, transform to slug, allow manual override, check uniqueness
+- [ ] T108 [US5] Implement topic save: call TopicsAdminService.create() or update(), show success toast, refresh topic list
+- [ ] T109 [US5] Implement delete protection: call checkArticleCount() before delete, if count > 0 show modal "This topic contains X articles. Reassign or confirm deletion"
+- [ ] T110 [US5] Implement article reassignment UI in delete modal: dropdown to select target topic, button to reassign all articles, then delete topic
+- [ ] T111 [US5] Implement topic permanent delete: show confirmation modal requiring "PERMANENT DELETE" typed, call TopicsAdminService.delete(), remove from all dropdowns
+- [ ] T112 [US5] Add topics management routes to `src/app/app.routes.ts` under /admin/topics (list, create, edit/:id)
+- [ ] T113 [US5] Update `docs/user-guide.md` adding "Topic Management" section with reassignment workflow, flat structure clarification
+- [ ] T114 [US5] Update `docs/data-schema.md` documenting topic cascade rules and delete protection trigger
 
-**Checkpoint**: At this point, User Stories 1-5 should all work independently. Content organization with categories is complete.
+**Checkpoint**: At this point, User Stories 1-5 should all work independently. Content organization with topics is complete.
 
 ---
 
@@ -348,6 +351,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [ ] T167 [P] Code cleanup: remove console.logs, fix ESLint warnings, ensure all imports organized, remove unused code
 - [ ] T168 [P] Security review: verify all admin routes protected by guards, check RLS policies, audit CORS settings, ensure no secrets in code
 - [ ] T168a [P] Verify CSRF protection: Confirm Supabase JWT tokens use Authorization header (not cookies), test that cross-origin requests without valid JWT are rejected, document CSRF prevention strategy in security review notes
+- [ ] T168b [P] Security test for CSRF protection: Use curl or Postman to send cross-origin POST request to Supabase API without valid JWT Authorization header, verify request is rejected with 401 Unauthorized. Confirm JWT tokens never stored in cookies (only localStorage). Document test results in security review notes.
 - [ ] T169 [P] Performance optimization: lazy-load images, implement virtual scrolling for long lists (>100 items), minimize bundle size
 - [ ] T170 Run integration test suite covering all user stories end-to-end, fix any failures
 - [ ] T171 Create admin settings page at `src/app/features/admin/settings/settings.page.ts` with cache clear, profile view, theme toggle (optional)
@@ -368,7 +372,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - **Phase 4 (US2 - Dashboard)**: Depends on Phase 2 and Phase 3 (needs auth) - Dashboard is landing page after login
 - **Phase 5 (US3 - Articles)**: Depends on Phase 2, can start in parallel with US2 after Phase 3
 - **Phase 6 (US4 - Parts)**: Depends on Phase 2, independent of other stories, can run in parallel
-- **Phase 7 (US5 - Categories)**: Depends on Phase 2, independent but categories needed for articles
+- **Phase 7 (US5 - Topics)**: Depends on Phase 2, independent but topics needed for articles
 - **Phase 8 (US8 - Responsive)**: Can start after any UI pages exist, cross-cutting concern
 - **Phase 9 (US6 - Activity)**: Depends on Phase 2, independent, can run in parallel
 - **Phase 10 (US7 - Trash)**: Depends on US3, US4, US5 implementing soft-delete first
@@ -406,7 +410,7 @@ For complete admin dashboard with all features:
 - **US2 (Dashboard)**: Depends on US1 (auth) - provides landing page after login
 - **US3 (Articles)**: Independent after Foundational phase - can run parallel with US4, US5
 - **US4 (Parts)**: Independent after Foundational phase - can run parallel
-- **US5 (Categories)**: Independent but logically needed before/with US3 (articles need categories)
+- **US5 (Topics)**: Independent but logically needed before/with US3 (articles need topics)
 - **US6 (Activity)**: Independent after Foundational phase (ActivityLogService) - can run parallel
 - **US7 (Trash)**: Depends on US3, US4, US5 implementing soft-delete first
 - **US8 (Responsive)**: Cross-cutting, can start after any UI exists
@@ -436,7 +440,7 @@ For complete admin dashboard with all features:
 Once US1 (Auth) and US2 (Dashboard) are complete:
 - Developer A: US3 Articles
 - Developer B: US4 Parts
-- Developer C: US5 Categories
+- Developer C: US5 Topics
 - Developer D: US6 Activity
 - All can work simultaneously without conflicts
 
@@ -532,7 +536,7 @@ Task: "Implement article save"
 **Week 3-4**: Parallel User Stories
 - Dev A: US3 Articles (Phase 5) - 24 tasks
 - Dev B: US4 Parts (Phase 6) - 22 tasks
-- Dev C: US5 Categories (Phase 7) - 15 tasks
+- Dev C: US5 Topics (Phase 7) - 15 tasks
 
 **Week 5**: Parallel User Stories
 - Dev A: US8 Responsive (Phase 8) - 9 tasks
@@ -556,7 +560,7 @@ Task: "Implement article save"
 - Phase 4 (US2 - Dashboard): 14 tasks (MVP)
 - Phase 5 (US3 - Articles): 24 tasks (MVP)
 - Phase 6 (US4 - Parts): 22 tasks
-- Phase 7 (US5 - Categories): 15 tasks
+- Phase 7 (US5 - Topics): 15 tasks
 - Phase 8 (US8 - Responsive): 9 tasks
 - Phase 9 (US6 - Activity): 15 tasks
 - Phase 10 (US7 - Trash): 15 tasks
@@ -564,7 +568,7 @@ Task: "Implement article save"
 
 **By Priority**:
 - P1 (Critical): 70 tasks (MVP: Auth, Dashboard, Articles)
-- P2 (Important): 46 tasks (Parts, Categories, Responsive)
+- P2 (Important): 46 tasks (Parts, Topics, Responsive)
 - P3 (Nice-to-have): 30 tasks (Activity, Trash)
 - Cross-cutting: 16 tasks (Polish)
 
@@ -575,7 +579,7 @@ Task: "Implement article save"
 - ✅ US2: Dashboard metrics display correctly, activity feed updates
 - ✅ US3: Create/edit/delete article, markdown preview, image upload
 - ✅ US4: Create/edit/delete part with specs, multi-image upload
-- ✅ US5: Create/edit/delete category, article reassignment
+- ✅ US5: Create/edit/delete topic, article reassignment
 - ✅ US6: View activity log, filter actions, export CSV
 - ✅ US7: Soft-delete to trash, restore, permanent delete
 - ✅ US8: Responsive layout on desktop/tablet/mobile

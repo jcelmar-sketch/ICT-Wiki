@@ -3,8 +3,8 @@
     <ion-title>Computer Parts</ion-title>
   </ion-toolbar>
 
-  <!-- Category Filter -->
-  <ion-toolbar>
+  <!-- Category Filter - Desktop (Segment) -->
+  <ion-toolbar class="desktop-filter">
     <ion-segment 
       [value]="selectedCategory" 
       (ionChange)="onCategoryChange($event)"
@@ -19,6 +19,24 @@
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
+
+  <!-- Category Filter - Mobile (Dropdown) -->
+  <ion-toolbar class="mobile-filter">
+    <ion-select
+      [(ngModel)]="selectedCategory"
+      (ionChange)="onCategoryChange($event)"
+      interface="popover"
+      placeholder="Select Category"
+      class="category-select"
+    >
+      <ion-select-option 
+        *ngFor="let cat of categories" 
+        [value]="cat.value"
+      >
+        {{ cat.label }}
+      </ion-select-option>
+    </ion-select>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>
@@ -26,13 +44,19 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Loading Skeleton -->
-  <div *ngIf="loading" class="parts-loading">
-    <app-skeleton-loader variant="part-card" [count]="6"></app-skeleton-loader>
-  </div>
+  <div class="parts-container">
+    <!-- Parts Section -->
+    <section class="parts-section" *ngIf="loading || parts.length > 0">
+      <div class="section-header">
+        <h2>{{ selectedCategory === 'all' ? 'All Computer Parts' : getCategoryLabel(selectedCategory) }}</h2>
+        <ion-icon name="hardware-chip" color="primary"></ion-icon>
+      </div>
 
-  <!-- Parts Grid -->
-  <div *ngIf="!loading" class="parts-grid">
+      <!-- Loading Skeleton -->
+      <app-skeleton-loader *ngIf="loading" variant="part-card" [count]="6"></app-skeleton-loader>
+
+      <!-- Parts Grid -->
+      <div *ngIf="!loading" class="parts-grid">
     <ion-card 
       *ngFor="let part of parts" 
       class="part-card"
@@ -61,13 +85,15 @@
         </div>
       </ion-card-content>
     </ion-card>
-  </div>
+      </div>
+    </section>
 
-  <!-- Empty State -->
-  <div *ngIf="!loading && parts.length === 0" class="empty-state">
-    <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
-    <h2>No Parts Found</h2>
-    <p>Try selecting a different category</p>
+    <!-- Empty State -->
+    <div *ngIf="!loading && parts.length === 0" class="empty-state">
+      <ion-icon name="cube-outline" size="large"></ion-icon>
+      <h3>No Parts Found</h3>
+      <p>Try selecting a different category</p>
+    </div>
   </div>
 
   <!-- Infinite Scroll -->

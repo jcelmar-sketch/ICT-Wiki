@@ -1,0 +1,146 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Parts Management</ion-title>
+    <ion-button slot="end" routerLink="/admin/parts/create">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Create Part
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Search and Filters -->
+  <div class="filter-row">
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionInput)="onSearchChange($event)"
+      placeholder="Search parts..."
+      debounce="300"
+    ></ion-searchbar>
+
+    <ion-select
+      [(ngModel)]="selectedType"
+      (ionChange)="onFilterChange()"
+      placeholder="All Types"
+    >
+      <ion-select-option value="">All Types</ion-select-option>
+      <ion-select-option *ngFor="let type of partTypes" [value]="type">
+        {{ type }}
+      </ion-select-option>
+    </ion-select>
+
+    <ion-select
+      [(ngModel)]="selectedBrand"
+      (ionChange)="onFilterChange()"
+      placeholder="All Brands"
+    >
+      <ion-select-option value="">All Brands</ion-select-option>
+      <ion-select-option *ngFor="let brand of brands" [value]="brand">
+        {{ brand }}
+      </ion-select-option>
+    </ion-select>
+  </div>
+
+  <!-- Parts Grid -->
+  <div class="parts-grid" *ngIf="!loading && parts.length > 0">
+    <ion-card *ngFor="let part of parts" class="part-card">
+      <ion-card-header>
+        <div class="card-header-content">
+          <ion-card-title>{{ part.name }}</ion-card-title>
+          <ion-badge [color]="getTypeColor(part.part_type)">
+            {{ part.part_type }}
+          </ion-badge>
+        </div>
+        <ion-card-subtitle>{{ part.brand }}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- First Image Preview -->
+        <div class="image-preview" *ngIf="part.images && part.images.length > 0">
+          <img [src]="part.images[0]" [alt]="part.name" />
+          <span class="image-count" *ngIf="part.images.length > 1">
+            +{{ part.images.length - 1 }} more
+          </span>
+        </div>
+
+        <!-- Description -->
+        <p class="description" *ngIf="part.description">
+          {{ part.description }}
+        </p>
+
+        <!-- Key Specs -->
+        <div class="specs-preview" *ngIf="part.specs && getSpecKeys(part.specs).length > 0">
+          <div class="spec-item" *ngFor="let key of getSpecKeys(part.specs).slice(0, 3)">
+            <strong>{{ key }}:</strong> {{ part.specs[key] }}
+          </div>
+          <span class="more-specs" *ngIf="getSpecKeys(part.specs).length > 3">
+            +{{ getSpecKeys(part.specs).length - 3 }} more specs
+          </span>
+        </div>
+
+        <!-- Price -->
+        <div class="price" *ngIf="part.price !== null">
+          <strong>Price:</strong> {{ formatPrice(part.price) }}
+        </div>
+
+        <!-- Actions -->
+        <div class="card-actions">
+          <ion-button
+            fill="outline"
+            size="small"
+            [routerLink]="['/admin/parts/edit', part.id]"
+          >
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Edit
+          </ion-button>
+          <ion-button
+            fill="outline"
+            size="small"
+            color="danger"
+            (click)="deletePart(part)"
+          >
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Delete
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && parts.length === 0">
+    <ion-icon name="hardware-chip-outline"></ion-icon>
+    <h2>No parts found</h2>
+    <p *ngIf="searchQuery || selectedType || selectedBrand">
+      Try adjusting your filters or search query.
+    </p>
+    <p *ngIf="!searchQuery && !selectedType && !selectedBrand">
+      Create your first hardware part to get started.
+    </p>
+    <ion-button routerLink="/admin/parts/create">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Create Part
+    </ion-button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Loading parts...</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-controls" *ngIf="!loading && parts.length > 0">
+    <ion-button
+      fill="outline"
+      [disabled]="currentPage === 1"
+      (click)="previousPage()"
+    >
+      Previous
+    </ion-button>
+    <span class="page-info">Page {{ currentPage }}</span>
+    <ion-button fill="outline" [disabled]="!hasMore" (click)="nextPage()">
+      Next
+    </ion-button>
+  </div>
+</ion-content>

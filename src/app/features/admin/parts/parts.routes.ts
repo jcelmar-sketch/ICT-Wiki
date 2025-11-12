@@ -4,6 +4,16 @@ export const partRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./parts-list.page').then((m) => m.PartsListPage),
+      import('./list/part-list.page').then((m) => m.PartListPage),
+  },
+  {
+    path: 'create',
+    loadComponent: () =>
+      import('./create/part-form.page').then((m) => m.PartFormPage),
+  },
+  {
+    path: 'edit/:id',
+    loadComponent: () =>
+      import('./create/part-form.page').then((m) => m.PartFormPage),
   },
 ];

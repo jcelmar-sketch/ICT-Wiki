@@ -3,7 +3,73 @@
  * Tasks T062-T067: Parts catalog with category filters
  */
 
-// Category Filter
+// Container
+.parts-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+// Section Header
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--ion-color-light-shade);
+
+  h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ion-text-color);
+  }
+
+  ion-icon {
+    font-size: 28px;
+  }
+}
+
+.parts-section {
+  margin-bottom: 32px;
+}
+
+// Category Filter - Responsive
+.mobile-filter {
+  display: block;
+  
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.desktop-filter {
+  display: none;
+  
+  @media (min-width: 768px) {
+    display: block;
+  }
+}
+
+// Mobile Dropdown
+.category-select {
+  width: 100%;
+  padding: 8px 16px;
+  max-width: none;
+  
+  &::part(text) {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  &::part(icon) {
+    color: var(--ion-color-primary);
+  }
+}
+
+// Desktop Segment
 ion-segment {
   --background: var(--ion-color-light);
   padding: 8px 16px;
@@ -23,13 +89,12 @@ ion-segment-button {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-  padding: 16px;
   width: 100%;
+  margin-top: 16px;
   
   @media (min-width: 768px) {
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 20px;
-    padding: 24px;
   }
 }
 
@@ -117,47 +182,36 @@ ion-card-content {
   }
 }
 
-// Loading State
-.parts-loading {
-  padding: 16px;
-  
-  @media (min-width: 768px) {
-    padding: 24px;
-  }
-}
-
 // Empty State
 .empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
-  padding: 48px 24px;
-  min-height: 50vh;
-  
-  .empty-icon {
+  padding: 64px 24px;
+  color: var(--ion-color-medium);
+
+  ion-icon {
     font-size: 80px;
-    color: var(--ion-color-medium);
+    opacity: 0.5;
     margin-bottom: 16px;
   }
-  
-  h2 {
+
+  h3 {
     font-size: 20px;
     font-weight: 600;
-    color: var(--ion-text-color);
-    margin: 0 0 8px;
+    margin: 16px 0 8px;
   }
-  
+
   p {
     font-size: 14px;
-    color: var(--ion-color-step-600, #666666);
     margin: 0;
   }
 }
 
 // Dark mode
 @media (prefers-color-scheme: dark) {
+  .section-header {
+    border-bottom-color: var(--ion-color-dark-tint);
+  }
+
   .part-description {
     color: var(--ion-color-step-400, #999999);
   }
@@ -166,7 +220,7 @@ ion-card-content {
     color: var(--ion-color-step-400, #999999);
   }
 
-  .empty-state p {
-    color: var(--ion-color-step-400, #999999);
+  .empty-state {
+    color: var(--ion-color-medium-tint);
   }
 }

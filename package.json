@@ -9,7 +9,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "db:seed:clear": "psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/reset-and-setup-admin.sql && psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/seed-database.sql && psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/update-image-placeholders.sql"
   },
   "private": true,
   "dependencies": {

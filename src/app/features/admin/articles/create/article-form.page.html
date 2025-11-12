@@ -1,0 +1,121 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-button slot="start" fill="clear" routerLink="/admin/articles">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <ion-title>{{ isEditMode ? 'Edit Article' : 'Create Article' }}</ion-title>
+    <ion-button slot="end" fill="clear" (click)="onSave()" [disabled]="saving || loading">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      {{ saving ? 'Saving...' : 'Save' }}
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="form-container" *ngIf="!loading; else loadingState">
+    <form [formGroup]="articleForm">
+      <!-- Title -->
+      <ion-item [class.ion-invalid]="hasError('title', 'required') || hasError('title', 'minlength') || hasError('title', 'maxlength')">
+        <ion-label position="stacked">Title *</ion-label>
+        <ion-input formControlName="title" placeholder="Enter article title (10-255 chars)"></ion-input>
+        <div class="error-message" *ngIf="articleForm.get('title')?.touched && articleForm.get('title')?.invalid">
+          {{ getErrorMessage('title') }}
+        </div>
+      </ion-item>
+
+      <!-- Slug -->
+      <ion-item [class.ion-invalid]="hasError('slug', 'required') || hasError('slug', 'pattern') || hasError('slug', 'notUnique')">
+        <ion-label position="stacked">Slug (URL) *</ion-label>
+        <ion-input formControlName="slug" placeholder="auto-generated-from-title"></ion-input>
+        <div class="error-message" *ngIf="articleForm.get('slug')?.touched && articleForm.get('slug')?.invalid">
+          {{ getErrorMessage('slug') }}
+        </div>
+      </ion-item>
+
+      <!-- Topic -->
+      <ion-item [class.ion-invalid]="hasError('topic_id', 'required')">
+        <ion-label position="stacked">Topic *</ion-label>
+        <ion-select formControlName="topic_id" placeholder="Select topic">
+          <!-- TODO: Load topics dynamically -->
+          <ion-select-option value="topic-1">Computer</ion-select-option>
+          <ion-select-option value="topic-2">Network</ion-select-option>
+          <ion-select-option value="topic-3">Software</ion-select-option>
+        </ion-select>
+        <div class="error-message" *ngIf="articleForm.get('topic_id')?.touched && articleForm.get('topic_id')?.invalid">
+          {{ getErrorMessage('topic_id') }}
+        </div>
+      </ion-item>
+
+      <!-- Excerpt -->
+      <ion-item [class.ion-invalid]="hasError('excerpt', 'maxlength')">
+        <ion-label position="stacked">Excerpt (Optional)</ion-label>
+        <ion-textarea 
+          formControlName="excerpt" 
+          placeholder="Short summary (max 500 chars)"
+          [rows]="3"
+        ></ion-textarea>
+        <div class="error-message" *ngIf="articleForm.get('excerpt')?.touched && articleForm.get('excerpt')?.invalid">
+          {{ getErrorMessage('excerpt') }}
+        </div>
+      </ion-item>
+
+      <!-- Cover Image -->
+      <app-image-upload
+        label="Cover Image"
+        bucket="articles"
+        [(imageUrl)]="articleForm.value.cover_image"
+        (imageUrlChange)="articleForm.patchValue({ cover_image: $event })"
+      ></app-image-upload>
+
+      <!-- Content (Markdown Editor) -->
+      <app-markdown-editor
+        [(content)]="articleForm.value.content"
+        (contentChange)="articleForm.patchValue({ content: $event })"
+      ></app-markdown-editor>
+      <div class="error-message" *ngIf="articleForm.get('content')?.touched && articleForm.get('content')?.invalid">
+        {{ getErrorMessage('content') }}
+      </div>
+
+      <!-- Status -->
+      <ion-item>
+        <ion-label position="stacked">Status *</ion-label>
+        <ion-select formControlName="status">
+          <ion-select-option value="draft">Draft</ion-select-option>
+          <ion-select-option value="published">Published</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Featured -->
+      <ion-item>
+        <ion-label>Featured on Homepage</ion-label>
+        <ion-toggle formControlName="is_featured" slot="end"></ion-toggle>
+      </ion-item>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <ion-button expand="block" (click)="onSave()" [disabled]="saving || articleForm.invalid">
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+          {{ saving ? 'Saving...' : (isEditMode ? 'Update Article' : 'Create Article') }}
+        </ion-button>
+
+        <ion-button 
+          *ngIf="isEditMode" 
+          expand="block" 
+          color="danger" 
+          fill="outline"
+          (click)="onDelete()"
+        >
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Delete Article
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading article...</p>
+    </div>
+  </ng-template>
+</ion-content>

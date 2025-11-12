@@ -1,34 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { environment } from '../../../../environments/environment';
-
-interface DashboardMetrics {
-  totalArticles: number;
-  totalTopics: number;
-  totalParts: number;
-  recentUploads: number;
-  pendingDrafts: number;
-  storageUsed: number;
-  storageQuota: number;
-  storagePercentage: number;
-}
-
-interface ActivityItem {
-  id: string;
-  timestamp: string;
-  admin_email: string;
-  action_type: string;
-  item_type: string | null;
-  item_title: string | null;
-}
+import { Subscription } from 'rxjs';
+import { DashboardMetricsService, DashboardMetrics, ActivityFeedItem } from '../../../core/services/dashboard-metrics.service';
+import { MetricCardComponent } from '../shared/metric-card/metric-card.component';
 
 /**
  * Admin Dashboard Page
+ * Task T039, T043: Main landing page showing metrics and activity feed
  * 
- * Main landing page showing metrics and activity feed (FR-007, FR-008, FR-009, FR-010).
  * Displays real-time metrics with 5-minute cache and activity feed updating every 30 seconds.
  */
 @Component({
@@ -36,136 +17,68 @@ interface ActivityItem {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule]
+  imports: [CommonModule, IonicModule, RouterModule, MetricCardComponent]
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
   private router = inject(Router);
-  private supabase!: SupabaseClient;
+  private metricsService = inject(DashboardMetricsService);
   
-  metrics: DashboardMetrics = {
-    totalArticles: 0,
-    totalTopics: 0,
-    totalParts: 0,
-    recentUploads: 0,
-    pendingDrafts: 0,
-    storageUsed: 0,
-    storageQuota: 0,
-    storagePercentage: 0
-  };
-  
-  activities: ActivityItem[] = [];
+  metrics: DashboardMetrics | null = null;
+  activities: ActivityFeedItem[] = [];
   loading = true;
-  storageWarning = false;
   
-  private metricsCache: { data: DashboardMetrics | null; timestamp: number } = { data: null, timestamp: 0 };
-  private readonly CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-  private activityRefreshInterval: any;
+  private metricsSubscription?: Subscription;
+  private activitySubscription?: Subscription;
 
-  async ngOnInit() {
-    await this.initializeSupabase();
-    await this.loadMetrics();
-    await this.loadActivities();
-    
-    // Refresh activity feed every 30 seconds (FR-008)
-    this.activityRefreshInterval = setInterval(() => {
-      this.loadActivities();
-    }, 30000);
-    
-    this.loading = false;
+  ngOnInit() {
+    // Load metrics with 5-minute cache (T037)
+    this.metricsSubscription = this.metricsService.getMetrics().subscribe({
+      next: (metrics) => {
+        this.metrics = metrics;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading metrics:', error);
+        this.loading = false;
+      }
+    });
+
+    // Load activity feed with 30-second refresh (T037)
+    this.activitySubscription = this.metricsService.getActivityFeed(20).subscribe({
+      next: (activities) => {
+        this.activities = activities;
+      },
+      error: (error) => {
+        console.error('Error loading activity feed:', error);
+      }
+    });
   }
   
   ngOnDestroy() {
-    if (this.activityRefreshInterval) {
-      clearInterval(this.activityRefreshInterval);
-    }
-  }
-  
-  private async initializeSupabase() {
-    const { createClient } = await import('@supabase/supabase-js');
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.anonKey
-    );
+    this.metricsSubscription?.unsubscribe();
+    this.activitySubscription?.unsubscribe();
+    this.metricsService.stopActivityFeedPolling();
   }
   
   /**
-   * Load dashboard metrics with 5-minute cache (FR-007)
+   * Manually refresh metrics
    */
-  async loadMetrics() {
-    const now = Date.now();
-    
-    // Check cache
-    if (this.metricsCache.data && (now - this.metricsCache.timestamp) < this.CACHE_DURATION_MS) {
-      this.metrics = this.metricsCache.data;
-      return;
-    }
-    
+  async refreshMetrics() {
+    this.loading = true;
     try {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
-      // Fetch all metrics in parallel
-      const [articlesResult, topicsResult, partsResult, recentResult, draftsResult, storageResult] = await Promise.all([
-        this.supabase.from('articles').select('id', { count: 'exact', head: true }).is('deleted_at', null),
-        this.supabase.from('topics').select('id', { count: 'exact', head: true }),
-        this.supabase.from('computer_parts').select('id', { count: 'exact', head: true }),
-        this.supabase.from('articles').select('id', { count: 'exact', head: true })
-          .is('deleted_at', null)
-          .gte('created_at', sevenDaysAgo.toISOString()),
-        this.supabase.from('articles').select('id', { count: 'exact', head: true })
-          .eq('status', 'draft')
-          .is('deleted_at', null),
-        this.supabase.from('storage_metrics').select('*').limit(1).single()
-      ]);
-      
-      this.metrics = {
-        totalArticles: articlesResult.count || 0,
-        totalTopics: topicsResult.count || 0,
-        totalParts: partsResult.count || 0,
-        recentUploads: recentResult.count || 0,
-        pendingDrafts: draftsResult.count || 0,
-        storageUsed: storageResult.data?.total_size_bytes || 0,
-        storageQuota: storageResult.data?.quota_bytes || 1073741824, // Default 1GB
-        storagePercentage: 0
-      };
-      
-      // Calculate storage percentage
-      if (this.metrics.storageQuota > 0) {
-        this.metrics.storagePercentage = Math.round((this.metrics.storageUsed / this.metrics.storageQuota) * 100);
-        this.storageWarning = this.metrics.storagePercentage > 80; // FR-009
-      }
-      
-      // Update cache
-      this.metricsCache = { data: this.metrics, timestamp: now };
+      await this.metricsService.refreshMetrics();
     } catch (error) {
-      console.error('Error loading metrics:', error);
+      console.error('Error refreshing metrics:', error);
+    } finally {
+      this.loading = false;
     }
   }
-  
+
   /**
-   * Load recent activity feed (FR-008)
+   * Navigate to quick action
    */
-  async loadActivities() {
-    try {
-      const { data, error } = await this.supabase
-        .from('activity_logs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-      
-      if (error) throw error;
-      
-      this.activities = (data || []).map(log => ({
-        id: log.id,
-        timestamp: log.created_at,
-        admin_email: log.admin_email,
-        action_type: log.action_type,
-        item_type: log.item_type,
-        item_title: log.item_title
-      }));
-    } catch (error) {
-      console.error('Error loading activities:', error);
-    }
+  navigateToCreate(type: 'article' | 'part' | 'topic') {
+    this.router.navigate([`/admin/${type}s/create`]);
   }
   
   /**
@@ -215,5 +128,12 @@ export class DashboardPage implements OnInit {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
     return `${Math.floor(diffMins / 1440)}d ago`;
+  }
+
+  /**
+   * Get storage warning state
+   */
+  get storageWarning(): boolean {
+    return this.metrics?.storageUsed.warning || false;
   }
 }

@@ -31,61 +31,26 @@
 
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   gap: 16px;
   margin-bottom: 24px;
-}
 
-.metric-card {
-  ion-card-content {
+  // Ensure all metric cards have equal height
+  app-metric-card {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-  }
+    height: 100%;
 
-  .metric-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-
-    ion-icon {
-      font-size: 28px;
+    ion-card {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    .white-icon {
-      color: #ffffff !important;
+    ion-card-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
     }
-  }
-
-  .metric-value {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: #ffffff;
-  }
-
-  .metric-label {
-    font-size: 14px;
-    color: #ffffff;
-    font-weight: 500;
-    opacity: 0.9;
-  }
-
-  .metric-detail {
-    font-size: 12px;
-    color: #ffffff;
-    margin-top: 4px;
-    opacity: 0.85;
-  }
-
-  &.storage-warning {
-    border: 2px solid var(--ion-color-danger);
   }
 }
 
@@ -110,6 +75,7 @@
     gap: 12px;
     font-size: 12px;
     margin-top: 4px;
+    flex-wrap: wrap;
 
     .timestamp {
       color: var(--ion-color-medium);
@@ -138,6 +104,16 @@
 @media (max-width: 768px) {
   .metrics-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
   }
 
   .quick-actions {

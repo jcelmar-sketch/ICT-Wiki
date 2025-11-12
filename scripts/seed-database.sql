@@ -171,6 +171,46 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     'gpu',
     'Excellent 1440p gaming card with 16GB GDDR6 memory. Great value with strong rasterization performance and competitive pricing.',
     NULL,
+    '{"vram": "16 GB GDDR6", "stream_processors": 3840, "game_clock": "2124 MHz", "boost_clock": "2430 MHz", "tdp": "263W", "interface": "PCIe 4.0 x16", "memory_bus": "256-bit"}'::jsonb,
+    'AMD'
+  ),
+  (
+    'cc6a7b8c-9d0e-1f2a-3b4c-5d6e7f8a9b0c'::uuid,
+    'NVIDIA GeForce RTX 4060',
+    'nvidia-geforce-rtx-4060',
+    'gpu',
+    '1440p gaming card with 8GB GDDR6 memory, DLSS 3, and excellent power efficiency for entry-level builds.',
+    NULL,
+    '{"vram": "8 GB GDDR6", "cuda_cores": 4352, "base_clock": "2310 MHz", "boost_clock": "2535 MHz", "tdp": "160W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
+    'NVIDIA'
+  ),
+  (
+    'dd7b8c9d-0e1f-2a3b-4c5d-6e7f8a9b0c1d'::uuid,
+    'AMD Radeon RX 7600',
+    'amd-radeon-rx-7600',
+    'gpu',
+    'Entry-level gaming card with 8GB GDDR6 memory, perfect for 1080p gaming at high settings with excellent value for budget builds.',
+    NULL,
+    '{"vram": "8 GB GDDR6", "stream_processors": 2048, "game_clock": "2250 MHz", "boost_clock": "2655 MHz", "tdp": "165W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
+    'AMD'
+  )
+ON CONFLICT (id) DO NOTHING;
+
+-- ============================================================================
+-- COMPUTER PARTS - RAM
+-- ============================================================================
+
+INSERT INTO computer_parts (id, name, slug, category, description, image, specs_json, manufacturer) VALUES
+  (
+    'a7b8c9d0-e1f2-4a5b-8c9d-0e1f2a3b4c5d'::uuid,
+    'Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz',
+    'corsair-vengeance-ddr5-32gb-6000mhz',
+    'ram',
+    'High-performance DDR5 memory kit with 32GB capacity running at 6000MHz. Features low-latency timings and heat spreaders for stable overclocking on modern platforms.',
+    NULL,
+    '{"capacity": "32 GB", "type": "DDR5", "speed": "6000 MHz", "cas_latency": "CL30", "voltage": "1.35V", "form_factor": "DIMM", "kit_configuration": "2x16GB"}'::jsonb,
+    'Corsair'
+  ),
   (
     'b8c9d0e1-f2a3-4b5c-8d9e-0f1a2b3c4d5e'::uuid,
     'G.Skill Trident Z5 RGB 64GB (2x32GB) 6400MHz',
@@ -201,44 +241,23 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     '{"capacity": "32 GB", "type": "DDR5", "speed": "5600 MHz", "cas_latency": "CL36", "voltage": "1.25V", "form_factor": "DIMM", "kit_configuration": "2x16GB"}'::jsonb,
     'Corsair'
   )
-ON CONFLICT (id) DO NOTHING;440p gaming card with 8GB GDDR6 memory, DLSS 3, and excellent power efficiency for entry-level builds.',
-    NULL,
-    '{"vram": "8 GB GDDR6", "cuda_cores": 4352, "base_clock": "2310 MHz", "boost_clock": "2535 MHz", "tdp": "160W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
-    'NVIDIA'
-  ),
-  (
-    'dd7b8c9d-0e1f-2a3b-4c5d-6e7f8a9b0c1d'::uuid,
-    'AMD Radeon RX 7600',
-    'amd-radeon-rx-7600',
-    'gpu',
-    'Entry-level gaming card with 8GB GDDR6 memory, perfect for 1080p gaming at high settings with excellent value for budget builds.',
-    NULL,
-    '{"vram": "8 GB GDDR6", "stream_processors": 2048, "game_clock": "2250 MHz", "boost_clock": "2655 MHz", "tdp": "165W", "interface": "PCIe 4.0 x16", "memory_bus": "128-bit"}'::jsonb,
-    'AMD'
-  )
 ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
--- COMPUTER PARTS - RAM========================================================
--- COMPUTER PARTS - RAM
+-- COMPUTER PARTS - Storage
 -- ============================================================================
 
 INSERT INTO computer_parts (id, name, slug, category, description, image, specs_json, manufacturer) VALUES
   (
-    'a7b8c9d0-e1f2-4a5b-8c9d-0e1f2a3b4c5d'::uuid,
-    'Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz',
-    'corsair-vengeance-ddr5-32gb-6000mhz',
-    'ram',
-    'High-performance DDR5 memory kit with 32GB capacity running at 6000MHz. Features low-latency timings and heat spreaders for stable overclocking on modern platforms.',
+    'c9d0e1f2-a3b4-4c5d-8e9f-0a1b2c3d4e5f'::uuid,
+    'Samsung 990 PRO 2TB NVMe SSD',
+    'samsung-990-pro-2tb',
+    'storage',
+    'Flagship PCIe 4.0 NVMe SSD delivering sequential read speeds up to 7,450 MB/s. Perfect for gaming, content creation, and demanding workloads with exceptional endurance.',
     NULL,
-    '{"capacity": "32 GB", "type": "DDR5", "speed": "6000 MHz", "cas_latency": "CL30", "voltage": "1.35V", "form_factor": "DIMM", "kit_configuration": "2x16GB"}'::jsonb,
-    'Corsair'
+    '{"capacity": "2 TB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "7450 MB/s", "write_speed": "6900 MB/s", "tbw": "1200 TB", "dram_cache": true}'::jsonb,
+    'Samsung'
   ),
-  (
-    'b8c9d0e1-f2a3-4b5c-8d9e-0f1a2b3c4d5e'::uuid,
-    'G.Skill Trident Z5 RGB 64GB (2x32GB) 6400MHz',
-    'gskill-trident-z5-rgb-64gb-6400mhz',
-    'ram',
   (
     'd0e1f2a3-b4c5-4d5e-8f9a-0b1c2d3e4f5a'::uuid,
     'WD Black SN850X 1TB NVMe SSD',
@@ -279,32 +298,7 @@ INSERT INTO computer_parts (id, name, slug, category, description, image, specs_
     '{"capacity": "500 GB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "3500 MB/s", "write_speed": "2100 MB/s", "tbw": "160 TB", "dram_cache": false}'::jsonb,
     'Kingston'
   )
-ON CONFLICT (id) DO NOTHING;===================================================
--- COMPUTER PARTS - Storage
--- ============================================================================
-
-INSERT INTO computer_parts (id, name, slug, category, description, image, specs_json, manufacturer) VALUES
-  (
-    'c9d0e1f2-a3b4-4c5d-8e9f-0a1b2c3d4e5f'::uuid,
-    'Samsung 990 PRO 2TB NVMe SSD',
-    'samsung-990-pro-2tb',
-    'storage',
-    'Flagship PCIe 4.0 NVMe SSD delivering sequential read speeds up to 7,450 MB/s. Perfect for gaming, content creation, and demanding workloads with exceptional endurance.',
-    NULL,
-    '{"capacity": "2 TB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "7450 MB/s", "write_speed": "6900 MB/s", "tbw": "1200 TB", "dram_cache": true}'::jsonb,
-    'Samsung'
-  ),
-  (
-    'd0e1f2a3-b4c5-4d5e-8f9a-0b1c2d3e4f5a'::uuid,
-    'WD Black SN850X 1TB NVMe SSD',
-    'wd-black-sn850x-1tb',
-    '{"capacity": "1 TB", "interface": "PCIe 4.0 x4 NVMe", "form_factor": "M.2 2280", "read_speed": "7300 MB/s", "write_speed": "6300 MB/s", "tbw": "600 TB", "dram_cache": true}'::jsonb,
-    'Western Digital'
-  )
 ON CONFLICT (id) DO NOTHING;
-
--- ============================================================================
--- ARTICLES - Computer Architecture
 
 -- ============================================================================
 -- ARTICLES - Computer Architecture
@@ -613,14 +607,14 @@ The memory hierarchy balances the competing demands of speed, capacity, and cost
 - Intelligent system component selection
 - Software optimization for better cache utilization
 - Troubleshooting performance bottlenecks
+- Informed decisions about system upgrades and configurations',
+    'Comprehensive guide to computer memory hierarchy from CPU registers to cloud storage, covering cache levels, RAM technologies, storage options, and optimization strategies.',
+    NULL,
+    'f7c9a3e1-8b4d-4c5e-a6f2-1d3e7b9c2a4f'::uuid,
     NOW() - INTERVAL '7 days',
     false
   )
 ON CONFLICT (id) DO NOTHING;
-
--- ============================================================================
--- ARTICLES - Networking
-  );
 
 -- ============================================================================
 -- ARTICLES - Networking
@@ -753,6 +747,11 @@ Secure tunneling protocols:
 TCP/IP is the backbone of modern networking. Mastering its concepts enables:
 - Effective network troubleshooting
 - Secure network design
+- Optimal performance tuning
+- Understanding of internet infrastructure',
+    'Deep dive into the TCP/IP protocol suite covering the four-layer model, TCP vs UDP, IP addressing, subnetting, NAT, and essential network tools.',
+    NULL,
+    'a2b4c6d8-1e3f-5a7b-9c0d-2e4f6a8b0c1d'::uuid,
     NOW() - INTERVAL '4 days',
     true
   )
@@ -760,7 +759,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ============================================================================
 -- ARTICLE TAGS (Link articles to tags)
-    true
+-- ============================================================================
 -- CPU Architecture article tags
 INSERT INTO article_tags (article_id, tag_id) VALUES
   ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid, '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid), -- Hardware
@@ -790,7 +789,11 @@ ON CONFLICT (article_id, tag_id) DO NOTHING;
 INSERT INTO article_tags (article_id, tag_id) VALUES
   ('4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a'::uuid, '8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e'::uuid) -- Specifications
 ON CONFLICT (article_id, tag_id) DO NOTHING;
-  ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, '5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b'::uuid), -- Storage
+
+-- ============================================================================
+-- RELATED ARTICLES
+-- ============================================================================
+
 -- CPU Architecture related articles
 INSERT INTO related_articles (article_id, related_article_id, "order") VALUES
   ('1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid, '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'::uuid, 1),
@@ -808,16 +811,6 @@ INSERT INTO related_articles (article_id, related_article_id, "order") VALUES
   ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid, 1),
   ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'::uuid, 2)
 ON CONFLICT (article_id, related_article_id) DO NOTHING;
-
--- GPU article related articles
-INSERT INTO related_articles (article_id, related_article_id, "order") VALUES
-  ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'::uuid, '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid, 1),
-  ('2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'::uuid, '3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, 2);
-
--- Memory Hierarchy related articles
-INSERT INTO related_articles (article_id, related_article_id, "order") VALUES
-  ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d'::uuid, 1),
-  ('3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f'::uuid, '2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e'::uuid, 2);
 
 -- ============================================================================
 -- VERIFICATION

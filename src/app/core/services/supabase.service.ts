@@ -22,7 +22,9 @@ export class SupabaseService {
       environment.supabase.anonKey,
       {
         auth: {
-          persistSession: false, // Read-only app, no authentication needed
+          persistSession: true, // Enable session persistence for admin auth
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
         },
       }
     );
@@ -65,5 +67,72 @@ export class SupabaseService {
     } catch {
       return false;
     }
+  }
+
+  // Admin Auth Methods (T015)
+
+  /**
+   * Get current admin session
+   * @returns Promise with session data or null
+   */
+  async getSession() {
+    const { data, error } = await this.supabase.auth.getSession();
+    if (error) throw error;
+    return data.session;
+  }
+
+  /**
+   * Get current admin user
+   * @returns Promise with user data or null
+   */
+  async getUser() {
+    const { data, error } = await this.supabase.auth.getUser();
+    if (error) throw error;
+    return data.user;
+  }
+
+  /**
+   * Sign in with email and password
+   * @param email - Admin email
+   * @param password - Admin password
+   * @returns Promise with session data
+   */
+  async signIn(email: string, password: string) {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  /**
+   * Sign out current admin user
+   * @returns Promise that resolves when signed out
+   */
+  async signOut() {
+    const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
+  }
+
+  /**
+   * Send password recovery email
+   * @param email - Admin email
+   * @returns Promise that resolves when email is sent
+   */
+  async resetPassword(email: string) {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/admin/reset-password`,
+    });
+    if (error) throw error;
+  }
+
+  /**
+   * Listen to auth state changes
+   * @param callback - Function to call when auth state changes
+   * @returns Subscription object with unsubscribe method
+   */
+  onAuthStateChange(callback: (event: string, session: any) => void) {
+    return this.supabase.auth.onAuthStateChange(callback);
   }
 }

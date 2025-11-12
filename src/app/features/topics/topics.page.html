@@ -10,31 +10,44 @@
   </ion-refresher>
 
   <div class="topics-container">
-    <h2>Browse by Topic</h2>
-    <p class="subtitle">Explore articles organized by category</p>
-
-    <!-- Loading -->
-    <app-skeleton-loader *ngIf="loading" variant="list" [count]="3"></app-skeleton-loader>
-
-    <!-- Error -->
+    <!-- Error Message -->
     <ion-card *ngIf="errorMessage" color="danger">
       <ion-card-content>{{ errorMessage }}</ion-card-content>
     </ion-card>
 
-    <!-- Topics Grid -->
-    <div class="topics-grid" *ngIf="!loading">
-      <ion-card
-        *ngFor="let topic of topics"
-        [routerLink]="['/tabs/topics', topic.slug]"
-        button="true"
-        class="topic-card"
-      >
-        <ion-card-content>
-          <ion-icon [name]="topic.icon || 'folder-outline'" size="large"></ion-icon>
-          <h3>{{ topic.name }}</h3>
-          <p>{{ topic.description }}</p>
-        </ion-card-content>
-      </ion-card>
+    <!-- Topics Section -->
+    <section class="topics-section" *ngIf="loading || topics.length > 0">
+      <div class="section-header">
+        <h2>Browse by Topic</h2>
+        <ion-icon name="folder-open" color="primary"></ion-icon>
+      </div>
+      <p class="section-subtitle">Explore articles organized by category</p>
+
+      <!-- Loading -->
+      <app-skeleton-loader *ngIf="loading" variant="list" [count]="3"></app-skeleton-loader>
+
+      <!-- Topics Grid -->
+      <div class="topics-grid" *ngIf="!loading">
+        <ion-card
+          *ngFor="let topic of topics"
+          [routerLink]="['/tabs/topics', topic.slug]"
+          button="true"
+          class="topic-card"
+        >
+          <ion-card-content>
+            <ion-icon [name]="topic.icon || 'folder-outline'" size="large"></ion-icon>
+            <h3>{{ topic.name }}</h3>
+            <p>{{ topic.description }}</p>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </section>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!loading && topics.length === 0 && !errorMessage">
+      <ion-icon name="folder-open-outline" size="large"></ion-icon>
+      <h3>No Topics Yet</h3>
+      <p>Check back later for new categories!</p>
     </div>
   </div>
 </ion-content>

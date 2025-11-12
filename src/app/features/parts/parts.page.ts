@@ -5,6 +5,7 @@
 
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { PartsService } from './parts.service';
@@ -17,7 +18,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './parts.page.html',
   styleUrls: ['./parts.page.scss'],
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterModule, SkeletonLoaderComponent],
+  imports: [CommonModule, FormsModule, IonicModule, RouterModule, SkeletonLoaderComponent],
 })
 export class PartsPage implements OnInit {
   private partsService = inject(PartsService);

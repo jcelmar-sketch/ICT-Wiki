@@ -63,8 +63,8 @@ An admin logs in and immediately sees a high-level overview of the site's health
 2. **Given** there are recent admin actions, **When** an admin views the dashboard, **Then** they see a feed of the last 20 actions with timestamp, admin email, action type (created/edited/deleted), and item name
 3. **Given** there are no articles yet, **When** an admin views the dashboard, **Then** the Articles card shows "0" and displays an empty state message "No articles yet"
 4. **Given** storage usage exceeds 80% of quota, **When** an admin views the dashboard, **Then** they see a warning indicator on the Storage Usage card
-5. **Given** there are sync errors or webhook failures, **When** an admin views the dashboard, **Then** they see an Alerts section highlighting these issues
-6. **Given** an admin wants to quickly create content, **When** they view the dashboard, **Then** they see prominent "Create Article", "Create Part", and "Create Category" buttons
+5. **Given** storage usage exceeds 80% of quota, **When** an admin views the dashboard, **Then** they see a warning banner with "Storage usage at X%. Consider deleting unused files."
+6. **Given** an admin wants to quickly create content, **When** they view the dashboard, **Then** they see prominent "Create Article", "Create Part", and "Create Topic" buttons
 
 ---
 
@@ -129,11 +129,11 @@ An admin needs to manage hardware parts information. They navigate to the Parts 
 
 ---
 
-### User Story 5 - Category Management (Priority: P2)
+### User Story 5 - Topic Management (Priority: P2)
 
-An admin needs to create and manage content categories. They navigate to the Categories section and see a list of all categories with name, slug, and article count. They can create new categories with name and slug (auto-generated). When editing, they can update the name and slug. Deleting a category is prevented if it still contains articles; the admin must either reassign articles to another category or confirm they want to delete all articles in that category.
+An admin needs to create and manage content topics.y navigate to the Topics section and see a list of all topics with name, slug, and article count. They can create new topics with name and slug (auto-generated). When editing, they can update the name and slug. Deleting a topic is prevented if it still contains articles; the admin must either reassign articles to another topic or confirm they want to delete all articles in that topic.
 
-**Why this priority**: Categories are organizational infrastructure for articles. While important, they can be managed after basic article CRUD is working. Initial categories could be manually created in the database.
+**Why this priority**: Topics are organizational infrastructure for articles. While important, they can be managed after basic article CRUD is working. Initial topics could be manually created in the database.
 
 **Independent Test**: Can be fully tested by creating a category, assigning articles to it, attempting to delete it (blocked), reassigning articles, then successfully deleting. Delivers value by providing content organization.
 
@@ -145,11 +145,11 @@ An admin needs to create and manage content categories. They navigate to the Cat
 
 **Acceptance Scenarios**:
 
-1. **Given** an admin is on the Categories list page, **When** they view the list, **Then** they see all categories with name, slug, article count, and action buttons (Edit, Delete)
-2. **Given** an admin clicks "Create Category", **When** the form loads, **Then** they see fields for name and slug (auto-generated from name)
-3. **Given** an admin creates a category with name "Graphics Cards", **When** they save, **Then** the slug is auto-generated as "graphics-cards" and the category appears in the list
-4. **Given** an admin tries to delete a category that has 5 articles, **When** they click Delete, **Then** they see a warning "This category contains 5 articles. Please reassign them to another category first or confirm permanent deletion of all articles"
-5. **Given** an admin deletes an empty category, **When** they confirm deletion, **Then** the category is permanently deleted and removed from all dropdown menus
+1. **Given** an admin is on the Topics list page, **When** they view the list, **Then** they see all topics with name, slug, article count, and action buttons (Edit, Delete)
+2. **Given** an admin clicks "Create Topic", **When** the form loads, **Then** they see fields for name and slug (auto-generated from name)
+3. **Given** an admin creates a topic with name "Graphics Cards", **When** they save, **Then** the slug is auto-generated as "graphics-cards" and the topic appears in the list
+4. **Given** an admin tries to delete a topic that has 5 articles, **When** they click Delete, **Then** they see a warning "This topic contains 5 articles. Please reassign them to another topic first or confirm permanent deletion of all articles"
+5. **Given** an admin deletes an empty topic, **When** they confirm deletion, **Then** the topic is permanently deleted and removed from all dropdown menus
 
 ---
 
@@ -252,8 +252,8 @@ An admin accesses the dashboard on their mobile phone, tablet, and desktop compu
 - **FR-006**: System MUST expire admin sessions after a configurable period of inactivity (default 30 minutes) and redirect to login with message "Session expired, please log in again"
 - **FR-007**: System MUST display dashboard metric cards showing counts for: Articles (total), Categories (total), Parts (total), Recent Uploads (last 7 days), Pending Drafts, Storage Usage (percentage and absolute size) using real-time queries with 5-minute cache
 - **FR-008**: System MUST display a feed of the last 20 admin actions on the dashboard with timestamp, admin email, action type, item type, and item name, updating every 30 seconds
-- **FR-009**: System MUST display an Alerts section on the dashboard showing any sync errors, webhook failures, or storage warnings (>80% quota used)
-- **FR-010**: System MUST provide quick action buttons on the dashboard for "Create Article", "Create Part", and "Create Category"
+- **FR-009**: System MUST display an Alerts section on the dashboard showing storage warnings when usage exceeds 80% of quota
+- **FR-010**: System MUST provide quick action buttons on the dashboard for "Create Article", "Create Part", and "Create Topic"
 - **FR-011**: System MUST provide an Articles list page showing all articles with: title, category, tags, author, created_at, updated_at, status (Published/Draft), and action buttons (View, Edit, Delete)
 - **FR-012**: System MUST support filtering articles by category, tag, status, and date range, plus text search on title
 - **FR-013**: System MUST paginate article lists with configurable page size (default 25 items per page)
@@ -275,13 +275,11 @@ An admin accesses the dashboard on their mobile phone, tablet, and desktop compu
 - **FR-029**: System MUST support multiple image uploads for parts with thumbnail previews and reorder/remove capabilities
 - **FR-030**: System MUST provide a specs editor for parts supporting structured key-value pairs stored as JSONB with predefined common fields (CPU Speed, Cores, TDP, RAM Size, etc.) and the ability to add custom fields. Validation: keys must be non-empty strings, values must be non-empty strings, no duplicate keys within same part
 - **FR-031**: System MUST implement soft-delete for parts using same pattern as articles (FR-023, FR-048): confirmation modal, move to Trash, 30-day retention
-- **FR-032**: System MUST provide a Categories list page showing all flat categories (no hierarchy) with: name, slug, article count, and action buttons (Edit, Delete)
-- **FR-033**: System MUST auto-generate URL-safe slugs from category names with option to manually edit and validate uniqueness
-- **FR-034**: System MUST prevent deletion of categories that contain articles and show warning message with article count and options to reassign or force delete
+- **FR-032**: System MUST provide a Topics list page showing all flat topics (no hierarchy) with: name, slug, article count, and action buttons (Edit, Delete)
+- **FR-033**: System MUST auto-generate URL-safe slugs from topic names with option to manually edit and validate uniqueness
+- **FR-034**: System MUST prevent deletion of topics that contain articles and show warning message with article count and options to reassign or force delete
 - **FR-035**: System MUST provide an Activity/Audit log page showing all admin actions: login success/failure, content CRUD operations, publish/unpublish actions
-- **FR-036**: System MUST record activity log entries with: timestamp, admin email, action type, item type, item identifier, item title, and optional notes
-- **FR-036a**: System MUST retain activity logs for 90 days with automated daily exports to cold storage for long-term archival
-- **FR-036b**: System MUST display activity logs for the last 30 days by default in the UI with option to search archived logs
+- **FR-036**: System MUST record activity log entries with: timestamp, admin email, action type, item type, item identifier, item title, and optional notes. Logs MUST be retained for 90 days in the database with automated daily exports to cold storage (Supabase Storage bucket `audit-archive`) at 2 AM UTC. The UI MUST display the last 30 days by default with pagination. Archived logs older than 30 days remain queryable in the database until the 90-day retention expires.
 - **FR-037**: System MUST support filtering activity log by admin email, action type, and date range
 - **FR-038**: System MUST display item-specific activity history when viewing individual articles, parts, or categories
 - **FR-039**: System MUST provide a Trash section showing all soft-deleted items with deletion timestamp and deleting admin's email
@@ -311,6 +309,7 @@ An admin accesses the dashboard on their mobile phone, tablet, and desktop compu
 - **Activity Log**: Audit trail entry recording admin actions. Database table: `activity_logs`, TypeScript interface: `ActivityLog`
 - **Trash**: Collection of soft-deleted items awaiting permanent deletion after 30-day retention period. UI route: `/admin/trash`
 - **Cold Storage**: Long-term archival storage for activity logs older than 90 days. Implementation: CSV exports in Supabase Storage bucket `audit-archive`
+- **Topic**: Represents a flat (non-hierarchical) content organizational grouping for articles. Database table: `topics`, TypeScript interface: `Topic`, UI label: "Topics"
 
 ## Key Entities
 
@@ -320,11 +319,11 @@ An admin accesses the dashboard on their mobile phone, tablet, and desktop compu
 
 - **Part**: Represents a hardware component with name, slug (unique), type, brand, image URLs (array), short description, specs (structured key-value pairs with predefined common fields like CPU Speed, RAM, TDP, plus custom fields for flexibility), created timestamp, updated timestamp, deleted timestamp.
 
-- **Category**: Represents a flat (non-hierarchical) content organizational category with name, slug (unique, URL-safe), description, created timestamp, updated timestamp. Has one-to-many relationship with Articles. No parent-child relationships between categories.
+- **Topic**: Represents a flat (non-hierarchical) content organizational grouping with name, slug (unique, URL-safe), description, created timestamp, updated timestamp. Has one-to-many relationship with Articles. No parent-child relationships between topics.
 
-- **Activity Log**: Represents an audit trail entry with timestamp, admin user (foreign key), action type (enum: login_success, login_failure, create, edit, delete, publish, unpublish, restore, permanent_delete), item type (enum: article, part, category, null for login events), item identifier (slug or ID), item title, optional notes (e.g., field changes), IP address.
+- **Activity Log**: Represents an audit trail entry with timestamp, admin user (foreign key), action type (enum: login_success, login_failure, create, edit, delete, publish, unpublish, restore, permanent_delete), item type (enum: article, part, topic, null for login events), item identifier (slug or ID), item title, optional notes (e.g., field changes), IP address.
 
-- **Trash Item**: Represents a soft-deleted content item (article, part, or category) with original item type, original item ID, deletion timestamp, deleted by admin (foreign key), item snapshot (JSON), auto-delete date (deletion timestamp + 30 days).
+- **Trash Item**: Represents a soft-deleted content item (article, part, or topic) with original item type, original item ID, deletion timestamp, deleted by admin (foreign key), item snapshot (JSON), auto-delete date (deletion timestamp + 30 days).
 
 - **Storage Metrics**: Represents storage usage tracking with total files count, total size in bytes, quota limit, last calculated timestamp. Updated on each upload/delete operation.
 

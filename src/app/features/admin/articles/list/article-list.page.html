@@ -1,0 +1,123 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Articles</ion-title>
+    <ion-button slot="end" routerLink="/admin/articles/create" fill="solid">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Create Article
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Filters -->
+  <div class="filters">
+    <ion-searchbar
+      [(ngModel)]="searchQuery"
+      (ionInput)="onSearchChange($event)"
+      placeholder="Search articles..."
+      debounce="300"
+    ></ion-searchbar>
+
+    <div class="filter-row">
+      <ion-select
+        [(ngModel)]="selectedStatus"
+        (ionChange)="onFilterChange()"
+        placeholder="All Status"
+        interface="popover"
+      >
+        <ion-select-option value="">All Status</ion-select-option>
+        <ion-select-option value="published">Published</ion-select-option>
+        <ion-select-option value="draft">Draft</ion-select-option>
+      </ion-select>
+
+      <ion-select
+        [(ngModel)]="selectedTopicId"
+        (ionChange)="onFilterChange()"
+        placeholder="All Topics"
+        interface="popover"
+      >
+        <ion-select-option value="">All Topics</ion-select-option>
+        <!-- TODO: Load topics dynamically -->
+      </ion-select>
+    </div>
+  </div>
+
+  <!-- Articles List -->
+  <div class="articles-container" *ngIf="!loading && articles.length > 0">
+    <ion-card *ngFor="let article of articles" [routerLink]="['/admin/articles/edit', article.id]" button>
+      <ion-card-header>
+        <div class="card-header-row">
+          <ion-card-title>{{ article.title }}</ion-card-title>
+          <ion-badge [color]="getStatusColor(article.status)">
+            {{ article.status }}
+          </ion-badge>
+        </div>
+        <ion-card-subtitle>
+          {{ formatDate(article.created_at) }}
+          <span *ngIf="article.updated_at !== article.created_at">
+            • Updated {{ formatDate(article.updated_at) }}
+          </span>
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <p class="excerpt" *ngIf="article.excerpt">{{ article.excerpt }}</p>
+        <div class="card-actions">
+          <ion-button
+            fill="clear"
+            size="small"
+            [routerLink]="['/admin/articles/edit', article.id]"
+          >
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Edit
+          </ion-button>
+          <ion-button
+            fill="clear"
+            size="small"
+            color="danger"
+            (click)="deleteArticle(article, $event)"
+          >
+            <ion-icon slot="start" name="trash-outline"></ion-icon>
+            Delete
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && articles.length === 0">
+    <ion-icon name="document-text-outline"></ion-icon>
+    <h3>No articles found</h3>
+    <p>Create your first article or adjust your filters</p>
+    <ion-button routerLink="/admin/articles/create">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Create Article
+    </ion-button>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Loading articles...</p>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!loading && articles.length > 0">
+    <ion-button
+      [disabled]="currentPage === 1"
+      (click)="previousPage()"
+      fill="outline"
+    >
+      Previous
+    </ion-button>
+    <span class="page-info">Page {{ currentPage }}</span>
+    <ion-button
+      [disabled]="!hasMore"
+      (click)="nextPage()"
+      fill="outline"
+    >
+      Next
+    </ion-button>
+  </div>
+</ion-content>

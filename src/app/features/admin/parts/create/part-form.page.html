@@ -1,0 +1,174 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-button slot="start" fill="clear" routerLink="/admin/parts">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <ion-title>{{ isEditMode ? 'Edit Part' : 'Create Part' }}</ion-title>
+    <ion-button slot="end" fill="clear" (click)="onSave()" [disabled]="saving || loading">
+      <ion-icon slot="start" name="save-outline"></ion-icon>
+      {{ saving ? 'Saving...' : 'Save' }}
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="form-container" *ngIf="!loading; else loadingState">
+    <form [formGroup]="partForm">
+      <!-- Basic Information -->
+      <div class="section">
+        <h2>Basic Information</h2>
+
+        <!-- Name -->
+        <ion-item
+          [class.ion-invalid]="
+            hasError('name', 'required') ||
+            hasError('name', 'minlength') ||
+            hasError('name', 'maxlength')
+          "
+        >
+          <ion-label position="stacked">Part Name *</ion-label>
+          <ion-input
+            formControlName="name"
+            placeholder="e.g., Intel Core i7-13700K"
+          ></ion-input>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('name')?.touched && partForm.get('name')?.invalid"
+          >
+            {{ getErrorMessage('name') }}
+          </div>
+        </ion-item>
+
+        <!-- Slug -->
+        <ion-item
+          [class.ion-invalid]="
+            hasError('slug', 'required') ||
+            hasError('slug', 'pattern') ||
+            hasError('slug', 'notUnique')
+          "
+        >
+          <ion-label position="stacked">Slug (URL) *</ion-label>
+          <ion-input
+            formControlName="slug"
+            placeholder="auto-generated-from-name"
+          ></ion-input>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('slug')?.touched && partForm.get('slug')?.invalid"
+          >
+            {{ getErrorMessage('slug') }}
+          </div>
+        </ion-item>
+
+        <!-- Part Type -->
+        <ion-item [class.ion-invalid]="hasError('part_type', 'required')">
+          <ion-label position="stacked">Part Type *</ion-label>
+          <ion-select formControlName="part_type" placeholder="Select type">
+            <ion-select-option *ngFor="let type of partTypes" [value]="type">
+              {{ type }}
+            </ion-select-option>
+          </ion-select>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('part_type')?.touched && partForm.get('part_type')?.invalid"
+          >
+            {{ getErrorMessage('part_type') }}
+          </div>
+        </ion-item>
+
+        <!-- Brand -->
+        <ion-item
+          [class.ion-invalid]="
+            hasError('brand', 'required') || hasError('brand', 'maxlength')
+          "
+        >
+          <ion-label position="stacked">Brand *</ion-label>
+          <ion-input formControlName="brand" placeholder="e.g., Intel, AMD, NVIDIA"></ion-input>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('brand')?.touched && partForm.get('brand')?.invalid"
+          >
+            {{ getErrorMessage('brand') }}
+          </div>
+        </ion-item>
+
+        <!-- Description -->
+        <ion-item [class.ion-invalid]="hasError('description', 'maxlength')">
+          <ion-label position="stacked">Description</ion-label>
+          <ion-textarea
+            formControlName="description"
+            placeholder="Brief description of the part (max 1000 chars)"
+            [rows]="4"
+          ></ion-textarea>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('description')?.touched && partForm.get('description')?.invalid"
+          >
+            {{ getErrorMessage('description') }}
+          </div>
+        </ion-item>
+
+        <!-- Price -->
+        <ion-item [class.ion-invalid]="hasError('price', 'min')">
+          <ion-label position="stacked">Price (Optional)</ion-label>
+          <ion-input
+            formControlName="price"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          ></ion-input>
+          <div
+            class="error-message"
+            *ngIf="partForm.get('price')?.touched && partForm.get('price')?.invalid"
+          >
+            {{ getErrorMessage('price') }}
+          </div>
+        </ion-item>
+      </div>
+
+      <!-- Specifications -->
+      <div class="section">
+        <app-specs-editor
+          [specs]="partForm.value.specs"
+          (specsChange)="onSpecsChange($event)"
+        ></app-specs-editor>
+      </div>
+
+      <!-- Images -->
+      <div class="section">
+        <app-multi-image-upload
+          bucket="parts"
+          [imageUrls]="partForm.value.images"
+          (imageUrlsChange)="onImagesChange($event)"
+        ></app-multi-image-upload>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <ion-button expand="block" (click)="onSave()" [disabled]="saving || partForm.invalid">
+          <ion-icon slot="start" name="save-outline"></ion-icon>
+          {{ saving ? 'Saving...' : isEditMode ? 'Update Part' : 'Create Part' }}
+        </ion-button>
+
+        <ion-button
+          *ngIf="isEditMode"
+          expand="block"
+          color="danger"
+          fill="outline"
+          (click)="onDelete()"
+        >
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Delete Part
+        </ion-button>
+      </div>
+    </form>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading part...</p>
+    </div>
+  </ng-template>
+</ion-content>
