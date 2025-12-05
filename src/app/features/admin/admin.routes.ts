@@ -43,10 +43,10 @@ export const adminRoutes: Routes = [
           import('./parts/parts.routes').then((m) => m.partRoutes),
       },
       {
-        path: 'categories',
+        path: 'topics',
         loadChildren: () =>
-          import('./categories/categories.routes').then(
-            (m) => m.categoryRoutes
+          import('./topics/topics.routes').then(
+            (m) => m.topicRoutes
           ),
       },
       {

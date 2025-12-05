@@ -50,7 +50,12 @@ interface ImageItem {
           (drop)="onDrop($event)"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
-          (click)="fileInput.click()"
+          (click)="openFilePicker(fileInput, $event)"
+          (keydown.enter)="openFilePicker(fileInput, $event)"
+          (keydown.space)="openFilePicker(fileInput, $event)"
+          tabindex="0"
+          role="button"
+          aria-label="Upload images"
         >
           <ion-icon name="cloud-upload-outline"></ion-icon>
           <p class="upload-text">
@@ -60,7 +65,8 @@ interface ImageItem {
           <input
             #fileInput
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            [attr.accept]="accept"
+            [attr.capture]="capture"
             multiple
             style="display: none"
             (change)="onFileSelect($event)"
@@ -293,6 +299,25 @@ interface ImageItem {
       color: var(--ion-color-medium);
       text-align: center;
     }
+
+    @media (max-width: 767px) {
+      .upload-area {
+        padding: 24px 16px;
+      }
+
+      .upload-text {
+        font-size: 14px;
+      }
+
+      .images-grid {
+        margin-top: 16px;
+      }
+
+      .image-actions ion-button {
+        width: 36px;
+        height: 36px;
+      }
+    }
   `],
   standalone: true,
   imports: [
@@ -314,6 +339,8 @@ export class MultiImageUploadComponent {
 
   @Input() label = 'Product Images';
   @Input() bucket = 'parts';
+  @Input() capture: string | null = 'environment';
+  @Input() accept = 'image/jpeg,image/png,image/webp';
   @Input() imageUrls: string[] = [];
   @Output() imageUrlsChange = new EventEmitter<string[]>();
 
@@ -366,6 +393,12 @@ export class MultiImageUploadComponent {
     }
     // Reset input
     event.target.value = '';
+  }
+
+  openFilePicker(input: HTMLInputElement, event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    input.click();
   }
 
   handleFiles(files: File[]) {

@@ -9,6 +9,7 @@ import {
   ActivityLogResponse
 } from '../models/activity-log.model';
 import { environment } from '../../../environments/environment';
+import { SupabaseService } from './supabase.service';
 
 /**
  * Activity Log Service
@@ -27,20 +28,11 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class ActivityLogService {
-  private supabase!: SupabaseClient;
+  private supabaseService = inject(SupabaseService);
+  private supabase: SupabaseClient = this.supabaseService.getClient();
   private readonly RETENTION_DAYS = environment.admin.activityLogRetentionDays;
 
-  constructor() {
-    this.initializeSupabase();
-  }
-
-  private async initializeSupabase(): Promise<void> {
-    const { createClient } = await import('@supabase/supabase-js');
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.anonKey
-    );
-  }
+  constructor() {}
 
   /**
    * Log a custom admin action
@@ -60,8 +52,6 @@ export class ActivityLogService {
   }
 
   private async performLog(log: Partial<ActivityLog>): Promise<boolean> {
-    await this.initializeSupabase();
-
     const { error } = await this.supabase
       .from('activity_logs')
       .insert({
@@ -90,8 +80,6 @@ export class ActivityLogService {
   }
 
   private async fetchActivity(filter: ActivityLogFilter): Promise<ActivityLogResponse> {
-    await this.initializeSupabase();
-
     const limit = filter.limit || 50;
     const offset = filter.offset || 0;
 
@@ -105,6 +93,10 @@ export class ActivityLogService {
     // Apply filters
     if (filter.admin_id) {
       query = query.eq('admin_id', filter.admin_id);
+    }
+
+    if (filter.admin_email) {
+      query = query.ilike('admin_email', `%${filter.admin_email}%`);
     }
 
     if (filter.action_type) {
@@ -171,8 +163,6 @@ export class ActivityLogService {
   }
 
   private async fetchItemHistory(itemType: string, itemId: string): Promise<ActivityLog[]> {
-    await this.initializeSupabase();
-
     const { data, error } = await this.supabase
       .from('activity_logs')
       .select('*')
@@ -202,8 +192,6 @@ export class ActivityLogService {
   }
 
   private async performArchival(): Promise<number> {
-    await this.initializeSupabase();
-
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.RETENTION_DAYS);
 
@@ -236,8 +224,6 @@ export class ActivityLogService {
   }
 
   private async fetchActivityStats(days: number): Promise<{ [key: string]: number }> {
-    await this.initializeSupabase();
-
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -275,8 +261,6 @@ export class ActivityLogService {
   }
 
   private async fetchMostActiveAdmins(limit: number, days: number): Promise<Array<{ admin_email: string; count: number }>> {
-    await this.initializeSupabase();
-
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 

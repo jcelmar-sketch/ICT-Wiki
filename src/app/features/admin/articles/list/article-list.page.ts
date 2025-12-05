@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -27,6 +28,8 @@ import { addIcons } from 'ionicons';
 import { addOutline, createOutline, trashOutline, documentTextOutline } from 'ionicons/icons';
 import { ArticlesAdminService } from '../../../../core/services/articles-admin.service';
 import { ArticleAdmin } from '../../../../core/models/article.model';
+import { TopicsAdminService } from '../../../../core/services/topics-admin.service';
+import { Topic } from '../../../../core/models/topic.model';
 
 @Component({
   selector: 'app-article-list',
@@ -58,10 +61,12 @@ import { ArticleAdmin } from '../../../../core/models/article.model';
     IonLabel,
   ],
 })
-export class ArticleListPage implements OnInit {
+export class ArticleListPage implements OnInit, ViewWillEnter {
   private articlesService = inject(ArticlesAdminService);
+  private topicsService = inject(TopicsAdminService);
   
   articles: ArticleAdmin[] = [];
+  topics: Topic[] = [];
   loading = true;
   
   // Filters
@@ -79,7 +84,23 @@ export class ArticleListPage implements OnInit {
   }
 
   ngOnInit() {
+    // Initial load handled by ionViewWillEnter
+    this.loadTopics();
+  }
+
+  ionViewWillEnter() {
     this.loadArticles();
+  }
+
+  loadTopics() {
+    this.topicsService.list().subscribe({
+      next: (topics) => {
+        this.topics = topics;
+      },
+      error: (error) => {
+        console.error('Error loading topics:', error);
+      }
+    });
   }
 
   /**

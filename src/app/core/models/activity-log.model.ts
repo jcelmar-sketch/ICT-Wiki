@@ -32,16 +32,20 @@ export interface ActivityLog {
 }
 
 export interface ActivityLogFilter {
+  admin_id?: string;
   admin_email?: string;
   action_type?: ActionType;
   item_type?: ItemType;
-  date_from?: string; // ISO date
-  date_to?: string; // ISO date
+  start_date?: Date;
+  end_date?: Date;
+  search?: string;
   limit?: number;
   offset?: number;
 }
 
 export interface ActivityLogResponse {
   logs: ActivityLog[];
-  total_count: number;
+  total: number;
+  limit: number;
+  offset: number;
 }

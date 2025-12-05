@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/topics"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Edit Topic' : 'New Topic' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    <div *ngIf="loading" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <form *ngIf="!loading" [formGroup]="topicForm" (ngSubmit)="onSubmit()">
+      <ion-list>
+        <!-- Name -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Name <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="name" placeholder="e.g. Computer Hardware"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="topicForm.get('name')?.touched && topicForm.get('name')?.invalid">
+          <ion-note color="danger" *ngIf="topicForm.get('name')?.hasError('required')">Name is required</ion-note>
+          <ion-note color="danger" *ngIf="topicForm.get('name')?.hasError('minlength')">Name must be at least 3 characters</ion-note>
+        </div>
+
+        <!-- Slug -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Slug <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input formControlName="slug" placeholder="e.g. computer-hardware"></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="topicForm.get('slug')?.touched && topicForm.get('slug')?.invalid">
+          <ion-note color="danger" *ngIf="topicForm.get('slug')?.hasError('required')">Slug is required</ion-note>
+          <ion-note color="danger" *ngIf="topicForm.get('slug')?.hasError('pattern')">Slug must contain only lowercase letters, numbers, and hyphens</ion-note>
+          <ion-note color="danger" *ngIf="topicForm.get('slug')?.hasError('notUnique')">Slug must be unique</ion-note>
+        </div>
+
+        <!-- Description -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Description</ion-label>
+          <ion-textarea formControlName="description" rows="3" placeholder="Brief description of this topic"></ion-textarea>
+        </ion-item>
+
+        <!-- Icon -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Icon (Ionicon Name)</ion-label>
+          <ion-input formControlName="icon" placeholder="e.g. desktop-outline"></ion-input>
+        </ion-item>
+        <ion-note class="ion-padding-start" color="medium" style="font-size: 12px;">
+          See <a href="https://ionic.io/ionicons" target="_blank">Ionicons</a> for available icons.
+        </ion-note>
+
+        <!-- Order -->
+        <ion-item lines="full">
+          <ion-label position="stacked">Display Order</ion-label>
+          <ion-input type="number" formControlName="order"></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <div class="ion-padding-top">
+        <ion-button expand="block" type="submit" [disabled]="topicForm.invalid || submitting">
+          <ion-spinner *ngIf="submitting" name="crescent"></ion-spinner>
+          <span *ngIf="!submitting">{{ isEditMode ? 'Update Topic' : 'Create Topic' }}</span>
+        </ion-button>
+        
+        <ion-button *ngIf="isEditMode" expand="block" color="danger" fill="outline" class="ion-margin-top" (click)="onDelete()" [disabled]="submitting">
+          Delete Topic
+        </ion-button>
+      </div>
+    </form>
+  </div>
+</ion-content>

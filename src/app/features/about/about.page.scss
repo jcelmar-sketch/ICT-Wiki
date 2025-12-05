@@ -1,0 +1,27 @@
+.about-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.app-logo {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  
+  img {
+    border-radius: 20%;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+}
+
+.version {
+  color: var(--ion-color-medium);
+  margin-bottom: 2rem;
+}
+
+.copyright {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}

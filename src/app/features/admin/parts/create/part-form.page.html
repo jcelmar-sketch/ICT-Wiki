@@ -144,6 +144,30 @@
         ></app-multi-image-upload>
       </div>
 
+      <!-- Activity History -->
+      <ion-card *ngIf="isEditMode" class="activity-history">
+        <ion-card-header>
+          <ion-card-title>Activity History</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="history-loading" *ngIf="historyLoading">
+            <ion-spinner></ion-spinner>
+          </div>
+          <ion-list *ngIf="!historyLoading && activityHistory.length">
+            <ion-item *ngFor="let log of activityHistory">
+              <ion-badge slot="start" [color]="actionBadgeColor(log.action_type)">
+                {{ formatAction(log.action_type) }}
+              </ion-badge>
+              <ion-label>
+                <div class="history-title">{{ log.item_title || 'Part' }}</div>
+                <div class="history-meta">{{ log.admin_email }} • {{ formatTimestamp(log.created_at) }}</div>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+          <p class="text-muted" *ngIf="!historyLoading && !activityHistory.length">No activity recorded yet.</p>
+        </ion-card-content>
+      </ion-card>
+
       <!-- Actions -->
       <div class="form-actions">
         <ion-button expand="block" (click)="onSave()" [disabled]="saving || partForm.invalid">

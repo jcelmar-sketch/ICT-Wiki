@@ -1,5 +1,17 @@
-ion-menu {
+:host {
+  display: block;
+  height: 100%;
+}
+
+.admin-shell {
+  --side-width: 280px;
+  --side-max-width: 320px;
+  min-height: 100%;
+}
+
+ion-menu.admin-menu {
   --width: 280px;
+  --side-width: 280px;
 
   ion-toolbar {
     --padding-start: 1rem;
@@ -54,6 +66,7 @@ ion-header {
 
 ion-content {
   --background: var(--ion-color-light);
+  min-height: 100%;
 }
 
 // Session warning
@@ -80,9 +93,65 @@ ion-content {
   }
 }
 
-// Responsive adjustments
-@media (max-width: 768px) {
+.mobile-only {
+  display: none;
+}
+
+// Desktop layout (>=1024px): full labels
+@media (min-width: 1024px) {
+  ion-menu.admin-menu {
+    --width: 280px;
+  }
+}
+
+// Tablet layout (768px - 1023px): collapsed icon-only sidebar
+@media (max-width: 1023px) and (min-width: 768px) {
+  ion-menu.admin-menu {
+    --width: 96px;
+    --side-width: 96px;
+
+    ion-toolbar {
+      --padding-start: 0.75rem;
+      --padding-end: 0.75rem;
+      ion-title {
+        font-size: 0.95rem;
+      }
+    }
+
+    ion-item {
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      justify-content: center;
+
+      ion-label {
+        display: none;
+      }
+
+      ion-icon {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+// Mobile layout (<768px): drawer menu and larger touch targets
+@media (max-width: 767px) {
   ion-split-pane {
     --side-width: 100%;
+  }
+
+  ion-menu.admin-menu {
+    --width: 260px;
+    --side-width: 260px;
+
+    ion-item {
+      --padding-start: 1.25rem;
+      --padding-end: 1.25rem;
+      min-height: 52px;
+    }
+  }
+
+  .mobile-only {
+    display: inline-flex;
   }
 }

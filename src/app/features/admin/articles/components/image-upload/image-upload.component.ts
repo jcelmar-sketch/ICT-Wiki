@@ -36,7 +36,12 @@ import { SupabaseService } from '../../../../../core/services/supabase.service';
           (drop)="onDrop($event)"
           (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)"
-          (click)="fileInput.click()"
+          (click)="openFilePicker(fileInput, $event)"
+          (keydown.enter)="openFilePicker(fileInput, $event)"
+          (keydown.space)="openFilePicker(fileInput, $event)"
+          tabindex="0"
+          role="button"
+          aria-label="Upload image"
         >
           <!-- Preview -->
           <div class="preview" *ngIf="imageUrl">
@@ -54,8 +59,8 @@ import { SupabaseService } from '../../../../../core/services/supabase.service';
           <!-- Upload Prompt -->
           <div class="upload-prompt" *ngIf="!imageUrl && !uploading">
             <ion-icon name="cloud-upload-outline"></ion-icon>
-            <p>Click or drag image here</p>
-            <small>Max 5MB • JPG, PNG, WebP</small>
+            <p>Tap or drag an image</p>
+            <small>Max 5MB • JPG, PNG, WebP • Camera or library</small>
           </div>
 
           <!-- Uploading State -->
@@ -81,7 +86,8 @@ import { SupabaseService } from '../../../../../core/services/supabase.service';
         <input
           #fileInput
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          [attr.accept]="accept"
+          [attr.capture]="capture"
           (change)="onFileSelected($event)"
           style="display: none"
         />
@@ -184,6 +190,24 @@ import { SupabaseService } from '../../../../../core/services/supabase.service';
         color: var(--ion-color-danger);
       }
     }
+
+    @media (max-width: 767px) {
+      .upload-area {
+        min-height: 160px;
+        padding: 16px;
+      }
+
+      .upload-prompt,
+      .uploading-state,
+      .success-state,
+      .error-state {
+        padding: 24px 12px;
+
+        ion-icon {
+          font-size: 48px;
+        }
+      }
+    }
   `],
   standalone: true,
   imports: [
@@ -203,6 +227,8 @@ export class ImageUploadComponent {
   
   @Input() label = 'Cover Image';
   @Input() bucket = 'articles';
+  @Input() capture: string | null = 'environment';
+  @Input() accept = 'image/jpeg,image/png,image/webp';
   @Input() imageUrl: string | null = null;
   @Output() imageUrlChange = new EventEmitter<string | null>();
 
@@ -248,6 +274,12 @@ export class ImageUploadComponent {
     if (input.files && input.files.length > 0) {
       this.uploadFile(input.files[0]);
     }
+  }
+
+  openFilePicker(input: HTMLInputElement, event?: Event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    input.click();
   }
 
   async uploadFile(file: File) {

@@ -2,6 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ViewWillEnter } from '@ionic/angular';
 import {
   IonHeader,
   IonToolbar,
@@ -54,7 +55,7 @@ import { PartAdmin } from '../../../../core/models/part.model';
     IonSpinner,
   ],
 })
-export class PartListPage implements OnInit {
+export class PartListPage implements OnInit, ViewWillEnter {
   private partsService = inject(PartsAdminService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
@@ -87,6 +88,10 @@ export class PartListPage implements OnInit {
 
   ngOnInit() {
     this.loadFilterOptions();
+    // Initial load handled by ionViewWillEnter
+  }
+
+  ionViewWillEnter() {
     this.loadParts();
   }
 

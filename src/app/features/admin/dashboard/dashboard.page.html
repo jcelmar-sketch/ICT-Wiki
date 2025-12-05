@@ -83,29 +83,57 @@
     <!-- Activity Feed (FR-008, T043) -->
     <ion-card class="activity-card">
       <ion-card-header>
-        <ion-card-title>Recent Activity</ion-card-title>
-        <ion-card-subtitle>Last 20 actions • Updates every 30 seconds</ion-card-subtitle>
+        <ion-card-title>Recent Activity (Last 24h)</ion-card-title>
+        <ion-card-subtitle>Page {{ currentPage }} of {{ Math.ceil(totalActivities / pageSize) || 1 }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
-        <ion-list *ngIf="activities.length > 0; else noActivity">
-          <ion-item *ngFor="let activity of activities" lines="inset">
-            <ion-icon slot="start" [name]="getActionIcon(activity.action_type)"></ion-icon>
-            <ion-label>
-              <h3>{{ formatActionType(activity.action_type) }}</h3>
-              <p *ngIf="activity.item_title">
-                {{ activity.item_type }}: {{ activity.item_title }}
-              </p>
-              <p class="activity-meta">
-                <span>{{ activity.admin_email }}</span>
-                <span class="timestamp">{{ formatTimestamp(activity.created_at) }}</span>
-              </p>
-            </ion-label>
-          </ion-item>
-        </ion-list>
+        <div class="table-container" *ngIf="activities.length > 0; else noActivity">
+          <table class="activity-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Item</th>
+                <th>Admin</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let activity of activities">
+                <td>
+                  <div class="action-cell">
+                    <ion-icon [name]="getActionIcon(activity.action_type)" class="action-icon"></ion-icon>
+                    {{ formatActionType(activity.action_type) }}
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="activity.item_title" class="item-cell">
+                    <ion-badge color="light" class="item-type">{{ activity.item_type }}</ion-badge>
+                    <span class="item-title">{{ activity.item_title }}</span>
+                  </div>
+                  <span *ngIf="!activity.item_title" class="text-muted">-</span>
+                </td>
+                <td>{{ activity.admin_email }}</td>
+                <td class="date-cell">{{ formatTimestamp(activity.created_at) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="pagination-controls" *ngIf="totalActivities > pageSize">
+          <ion-button fill="clear" size="small" (click)="prevPage()" [disabled]="currentPage === 1">
+            <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+            Prev
+          </ion-button>
+          <ion-button fill="clear" size="small" (click)="nextPage()" [disabled]="currentPage * pageSize >= totalActivities">
+            Next
+            <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+          </ion-button>
+        </div>
+
         <ng-template #noActivity>
           <div class="empty-state">
             <ion-icon name="list-outline" class="empty-icon"></ion-icon>
-            <p>No activity yet</p>
+            <p>No activity in the last 24 hours</p>
           </div>
         </ng-template>
         <ion-button expand="block" fill="clear" routerLink="/admin/activity" class="view-all-btn">

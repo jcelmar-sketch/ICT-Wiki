@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, from, throwError, of } from 'rxjs';
-import { map, catchError, tap, switchMap } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { AdminUser, AdminSession, LoginCredentials, LoginResponse, SessionStatus } from '../models/admin.model';
 import { environment } from '../../../environments/environment';
+import { SupabaseService } from './supabase.service';
 
 /**
  * Admin Authentication Service
@@ -25,6 +26,8 @@ import { environment } from '../../../environments/environment';
 })
 export class AdminAuthService {
   private router = inject(Router);
+  private supabaseService = inject(SupabaseService);
+  private supabase: SupabaseClient = this.supabaseService.getClient();
   
   // Session state
   private currentSessionSubject = new BehaviorSubject<AdminSession | null>(null);
@@ -36,39 +39,16 @@ export class AdminAuthService {
   private readonly SESSION_TIMEOUT_MS = environment.admin.sessionTimeoutMinutes * 60 * 1000;
   private readonly MAX_FAILED_ATTEMPTS = environment.admin.maxFailedLoginAttempts;
   private readonly LOCKOUT_DURATION_MS = environment.admin.accountLockoutMinutes * 60 * 1000;
-  
-  private supabase!: SupabaseClient;
+  private readonly FORM_TTL_MS = 24 * 60 * 60 * 1000; // 24h persistence
 
   constructor() {
-    this.initializeSupabase();
     this.checkExistingSession();
-  }
-
-  /**
-   * Initialize Supabase client with admin auth configuration
-   */
-  private async initializeSupabase(): Promise<void> {
-    const { createClient } = await import('@supabase/supabase-js');
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.anonKey,
-      {
-        auth: {
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: false,
-          storage: localStorage
-        }
-      }
-    );
   }
 
   /**
    * Check for existing valid session on service initialization
    */
   private async checkExistingSession(): Promise<void> {
-    await this.initializeSupabase();
-    
     const { data: { session } } = await this.supabase.auth.getSession();
     
     if (session?.user) {
@@ -219,6 +199,7 @@ export class AdminAuthService {
 
   private async performLogout(): Promise<void> {
     this.clearSessionTimeout();
+    this.clearFormState();
     
     await this.supabase.auth.signOut();
     
@@ -384,6 +365,69 @@ export class AdminAuthService {
       clearTimeout(this.sessionTimeoutHandle);
       this.sessionTimeoutHandle = null;
     }
+  }
+
+  // Form state persistence for session timeout recovery
+
+  saveFormState(formType: string, itemId: string | null, formData: Record<string, any>): void {
+    const sanitized = { ...formData };
+    delete (sanitized as any).password;
+    delete (sanitized as any).confirmPassword;
+
+    const payload = {
+      formData: sanitized,
+      savedAt: Date.now(),
+      expiresAt: Date.now() + this.FORM_TTL_MS,
+    };
+
+    const key = this.getFormStorageKey(formType, itemId);
+    localStorage.setItem(key, JSON.stringify(payload));
+  }
+
+  getSavedFormState<T = Record<string, any>>(formType: string, itemId: string | null): T | null {
+    const key = this.getFormStorageKey(formType, itemId);
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+
+    try {
+      const payload = JSON.parse(raw) as { formData: T; expiresAt: number };
+      if (Date.now() > payload.expiresAt) {
+        localStorage.removeItem(key);
+        return null;
+      }
+      return payload.formData;
+    } catch (error) {
+      console.error('Failed to parse saved form state', error);
+      localStorage.removeItem(key);
+      return null;
+    }
+  }
+
+  purgeExpiredFormState(): void {
+    const now = Date.now();
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith('admin_form_'))
+      .forEach((key) => {
+        try {
+          const payload = JSON.parse(localStorage.getItem(key) || '{}');
+          if (!payload.expiresAt || now > payload.expiresAt) {
+            localStorage.removeItem(key);
+          }
+        } catch {
+          localStorage.removeItem(key);
+        }
+      });
+  }
+
+  clearFormState(): void {
+    Object.keys(localStorage)
+      .filter((key) => key.startsWith('admin_form_'))
+      .forEach((key) => localStorage.removeItem(key));
+  }
+
+  private getFormStorageKey(formType: string, itemId: string | null): string {
+    const normalizedId = itemId || 'new';
+    return `admin_form_${formType}_${normalizedId}`;
   }
 
   private async logLoginSuccess(adminId: string, email: string): Promise<void> {

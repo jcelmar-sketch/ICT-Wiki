@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Topics</ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="create">
+        <ion-icon slot="start" name="add"></ion-icon>
+        New Topic
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="ion-text-center ion-padding">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && (topics$ | async)?.length === 0" class="ion-text-center ion-padding">
+      <ion-icon name="folder-open-outline" style="font-size: 64px; color: var(--ion-color-medium);"></ion-icon>
+      <h3>No Topics Found</h3>
+      <p>Create your first topic to organize articles.</p>
+      <ion-button routerLink="create" class="ion-margin-top">
+        Create Topic
+      </ion-button>
+    </div>
+
+    <!-- Topics List -->
+    <ion-list *ngIf="!loading && (topics$ | async)?.length! > 0">
+      <ion-item-sliding *ngFor="let topic of topics$ | async">
+        <ion-item lines="full" detail="true" [routerLink]="['edit', topic.id]">
+          <ion-icon [name]="topic.icon || 'folder-outline'" slot="start" color="primary"></ion-icon>
+          <ion-label>
+            <h2>{{ topic.name }}</h2>
+            <p>{{ topic.description || 'No description' }}</p>
+          </ion-label>
+          <ion-badge slot="end" color="light">{{ topic.article_count || 0 }} articles</ion-badge>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteTopic(topic)">
+            <ion-icon slot="icon-only" name="trash"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+</ion-content>

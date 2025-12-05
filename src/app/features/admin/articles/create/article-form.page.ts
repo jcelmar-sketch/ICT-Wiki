@@ -17,6 +17,12 @@ import {
   IonItem,
   IonLabel,
   IonSpinner,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonList,
+  IonBadge,
   ToastController,
   AlertController,
 } from '@ionic/angular/standalone';
@@ -28,6 +34,8 @@ import { MarkdownEditorComponent } from '../components/markdown-editor/markdown-
 import { ImageUploadComponent } from '../components/image-upload/image-upload.component';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ActivityLogService } from '../../../../core/services/activity-log.service';
+import { ActivityLog, ActionType } from '../../../../core/models/activity-log.model';
 
 @Component({
   selector: 'app-article-form',
@@ -52,6 +60,12 @@ import { of } from 'rxjs';
     IonItem,
     IonLabel,
     IonSpinner,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonList,
+    IonBadge,
     MarkdownEditorComponent,
     ImageUploadComponent,
   ],
@@ -63,6 +77,7 @@ export class ArticleFormPage implements OnInit {
   private articlesService = inject(ArticlesAdminService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
+  private activityLogService = inject(ActivityLogService);
 
   articleForm!: FormGroup;
   isEditMode = false;
@@ -70,6 +85,8 @@ export class ArticleFormPage implements OnInit {
   loading = true;
   saving = false;
   article: ArticleAdmin | null = null;
+  activityHistory: ActivityLog[] = [];
+  historyLoading = false;
   
   // For concurrent edit detection (T070)
   private lastUpdatedTimestamp: string | null = null;
@@ -155,6 +172,7 @@ export class ArticleFormPage implements OnInit {
         });
         
         this.loading = false;
+        this.loadActivityHistory(article.id);
       },
       error: (error) => {
         console.error('Error loading article:', error);
@@ -324,6 +342,43 @@ export class ArticleFormPage implements OnInit {
         this.showToast('Failed to delete article', 'danger');
       },
     });
+  }
+
+  loadActivityHistory(articleId: string) {
+    this.historyLoading = true;
+    this.activityLogService.getItemHistory('article', articleId).subscribe({
+      next: (logs) => {
+        this.activityHistory = logs.slice(0, 10);
+        this.historyLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load activity history', error);
+        this.historyLoading = false;
+      },
+    });
+  }
+
+  formatAction(action: string | ActionType): string {
+    return `${action}`.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+
+  actionBadgeColor(action: ActionType | string): string {
+    const map: Record<string, string> = {
+      [ActionType.CREATE]: 'primary',
+      [ActionType.EDIT]: 'tertiary',
+      [ActionType.DELETE]: 'danger',
+      [ActionType.RESTORE]: 'success',
+      [ActionType.PERMANENT_DELETE]: 'danger',
+      [ActionType.PUBLISH]: 'success',
+      [ActionType.UNPUBLISH]: 'medium',
+      [ActionType.LOGIN_SUCCESS]: 'success',
+      [ActionType.LOGIN_FAILURE]: 'warning',
+    };
+    return map[action as string] || 'medium';
+  }
+
+  formatTimestamp(timestamp: string): string {
+    return new Date(timestamp).toLocaleString();
   }
 
   /**

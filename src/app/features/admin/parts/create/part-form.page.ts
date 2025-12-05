@@ -16,6 +16,12 @@ import {
   IonItem,
   IonLabel,
   IonSpinner,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardContent,
+  IonList,
+  IonBadge,
   ToastController,
   AlertController,
 } from '@ionic/angular/standalone';
@@ -26,6 +32,8 @@ import { PartAdmin, PartFormData, PartSpecs } from '../../../../core/models/part
 import { SpecsEditorComponent } from '../components/specs-editor/specs-editor.component';
 import { MultiImageUploadComponent } from '../components/multi-image-upload/multi-image-upload.component';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ActivityLogService } from '../../../../core/services/activity-log.service';
+import { ActivityLog, ActionType } from '../../../../core/models/activity-log.model';
 
 @Component({
   selector: 'app-part-form',
@@ -49,6 +57,12 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
     IonItem,
     IonLabel,
     IonSpinner,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonList,
+    IonBadge,
     SpecsEditorComponent,
     MultiImageUploadComponent,
   ],
@@ -60,6 +74,7 @@ export class PartFormPage implements OnInit {
   private partsService = inject(PartsAdminService);
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
+  private activityLogService = inject(ActivityLogService);
 
   partForm!: FormGroup;
   isEditMode = false;
@@ -73,6 +88,8 @@ export class PartFormPage implements OnInit {
 
   // For concurrent edit detection
   private lastUpdatedTimestamp: string | null = null;
+  activityHistory: ActivityLog[] = [];
+  historyLoading = false;
 
   constructor() {
     addIcons({ arrowBackOutline, saveOutline, trashOutline });
@@ -165,6 +182,7 @@ export class PartFormPage implements OnInit {
         });
 
         this.loading = false;
+        this.loadActivityHistory(part.id);
       },
       error: (error) => {
         console.error('Error loading part:', error);
@@ -321,6 +339,43 @@ export class PartFormPage implements OnInit {
         this.showToast('Failed to delete part', 'danger');
       },
     });
+  }
+
+  loadActivityHistory(partId: string) {
+    this.historyLoading = true;
+    this.activityLogService.getItemHistory('part', partId).subscribe({
+      next: (logs) => {
+        this.activityHistory = logs.slice(0, 10);
+        this.historyLoading = false;
+      },
+      error: (error) => {
+        console.error('Failed to load activity history', error);
+        this.historyLoading = false;
+      },
+    });
+  }
+
+  formatAction(action: string | ActionType): string {
+    return `${action}`.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  }
+
+  actionBadgeColor(action: ActionType | string): string {
+    const map: Record<string, string> = {
+      [ActionType.CREATE]: 'primary',
+      [ActionType.EDIT]: 'tertiary',
+      [ActionType.DELETE]: 'danger',
+      [ActionType.RESTORE]: 'success',
+      [ActionType.PERMANENT_DELETE]: 'danger',
+      [ActionType.PUBLISH]: 'success',
+      [ActionType.UNPUBLISH]: 'medium',
+      [ActionType.LOGIN_SUCCESS]: 'success',
+      [ActionType.LOGIN_FAILURE]: 'warning',
+    };
+    return map[action as string] || 'medium';
+  }
+
+  formatTimestamp(timestamp: string): string {
+    return new Date(timestamp).toLocaleString();
   }
 
   /**

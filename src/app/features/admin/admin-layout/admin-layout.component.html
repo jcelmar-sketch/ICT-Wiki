@@ -1,6 +1,10 @@
-<ion-split-pane contentId="admin-content">
+<ion-split-pane
+  contentId="admin-content"
+  class="admin-shell"
+  [when]="splitPaneWhen"
+>
   <!-- Sidebar Menu -->
-  <ion-menu contentId="admin-content" type="overlay">
+  <ion-menu contentId="admin-content" type="overlay" class="admin-menu">
     <ion-header>
       <ion-toolbar color="primary">
         <ion-title>Admin Panel</ion-title>
@@ -25,8 +29,8 @@
             <ion-label>Computer Parts</ion-label>
           </ion-item>
 
-          <ion-item button (click)="navigate('categories')" routerLink="/admin/categories" routerLinkActive="active">
-            <ion-icon slot="start" name="folder-outline"></ion-icon>
+          <ion-item button (click)="navigate('topics')" routerLink="/admin/topics" routerLinkActive="active">
+            <ion-icon slot="start" name="pricetags-outline"></ion-icon>
             <ion-label>Topics</ion-label>
           </ion-item>
 
@@ -70,8 +74,8 @@
     <!-- Header -->
     <ion-header>
       <ion-toolbar color="primary">
-        <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
+        <ion-buttons slot="start" class="mobile-only">
+          <ion-menu-button aria-label="Open navigation"></ion-menu-button>
         </ion-buttons>
         <ion-title>ICT Wiki Admin</ion-title>
         <ion-buttons slot="end">

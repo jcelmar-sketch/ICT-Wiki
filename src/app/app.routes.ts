@@ -25,6 +25,10 @@ export const routes: Routes = [
     loadChildren: () => import('./features/admin/admin.routes').then((m) => m.adminRoutes),
   },
   {
+    path: 'about',
+    loadComponent: () => import('./features/about/about.page').then( m => m.AboutPage)
+  },
+  {
     path: '',
     loadChildren: () => import('./tabs/tabs.routes').then((m) => m.routes),
   },

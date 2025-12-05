@@ -1,6 +1,6 @@
 {
   "name": "ict-wiki-app",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "author": "Ionic Framework",
   "homepage": "https://ionicframework.com/",
   "scripts": {
@@ -10,7 +10,10 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "db:seed:clear": "psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/reset-and-setup-admin.sql && psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/seed-database.sql && psql -h db.ldymwxewqimxqnzmvblo.supabase.co -p 5432 -U postgres -d postgres -f scripts/update-image-placeholders.sql"
+    "postinstall": "node scripts/fix-stencil-empty-glob.js",
+    "db:verify": "node scripts/verify-setup.js",
+    "db:setup": "node scripts/setup-supabase.js",
+    "db:reset": "node scripts/reset-db.js"
   },
   "private": true,
   "dependencies": {
@@ -53,10 +56,13 @@
     "@ionic/angular-toolkit": "^12.0.0",
     "@types/dompurify": "^3.0.5",
     "@types/jasmine": "~5.1.0",
+    "@types/jest": "^30.0.0",
     "@types/marked": "^5.0.2",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
+    "dotenv": "^17.2.3",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.29.1",

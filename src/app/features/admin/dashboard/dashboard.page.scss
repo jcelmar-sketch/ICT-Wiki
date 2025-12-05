@@ -44,6 +44,7 @@
       width: 100%;
       display: flex;
       flex-direction: column;
+      margin: 0;
     }
 
     ion-card-content {
@@ -55,32 +56,86 @@
 }
 
 .activity-card {
+  width: 100%;
+  margin: 0;
+  
   ion-card-subtitle {
     font-size: 12px;
     margin-top: 4px;
   }
 
-  ion-list {
-    margin: 0 -16px;
-  }
-
-  ion-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
-  }
-
-  .activity-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    font-size: 12px;
-    margin-top: 4px;
-    flex-wrap: wrap;
-
-    .timestamp {
-      color: var(--ion-color-medium);
-      white-space: nowrap;
+  .table-container {
+    overflow-x: auto;
+    margin: 0 -16px; // Negative margin to flush with card edges on mobile
+    
+    @media (min-width: 576px) {
+      margin: 0;
     }
+  }
+  
+  .activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; // Ensure table doesn't squash on small screens
+    
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: var(--ion-color-light);
+      color: var(--ion-color-medium);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-bottom: 1px solid var(--ion-color-light-shade);
+    }
+    
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--ion-color-light);
+      font-size: 0.9rem;
+      vertical-align: middle;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+  
+  .action-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+  
+  .action-icon {
+    font-size: 1.1rem;
+    color: var(--ion-color-primary);
+  }
+  
+  .item-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .item-type {
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+  }
+  
+  .item-title {
+    font-weight: 500;
+  }
+  
+  .date-cell {
+    white-space: nowrap;
+    color: var(--ion-color-medium);
+    font-size: 0.85rem;
+  }
+  
+  .text-muted {
+    color: var(--ion-color-medium-tint);
   }
 
   .empty-state {
@@ -97,6 +152,14 @@
 
   .view-all-btn {
     margin-top: 16px;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px solid var(--ion-color-light);
   }
 }
 

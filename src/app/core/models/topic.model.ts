@@ -11,6 +11,8 @@ export interface Topic {
   icon: string | null; // Ionicon name (e.g., 'desktop-outline')
   order: number; // Display order (1-based, unique)
   created_at: string; // ISO 8601 timestamp
+  deleted_at?: string | null; // Soft-delete timestamp
+  article_count?: number; // Count of associated articles
 }
 
 /**

@@ -41,8 +41,10 @@ import DOMPurify from 'dompurify';
               [(ngModel)]="content"
               (ngModelChange)="onContentChange()"
               [rows]="20"
+              [autoGrow]="true"
               placeholder="Write your article content in Markdown..."
               [autofocus]="true"
+              aria-label="Markdown content editor"
             ></ion-textarea>
           </div>
 
@@ -190,6 +192,19 @@ import DOMPurify from 'dompurify';
 
       .editor-container.split-view {
         grid-template-columns: 1fr;
+      }
+
+      .editor-container {
+        min-height: 320px;
+      }
+
+      .editor-pane,
+      .preview-pane {
+        min-height: 260px;
+      }
+
+      .preview-pane {
+        max-height: 360px;
       }
     }
   `],

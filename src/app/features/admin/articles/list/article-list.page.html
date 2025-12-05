@@ -37,7 +37,9 @@
         interface="popover"
       >
         <ion-select-option value="">All Topics</ion-select-option>
-        <!-- TODO: Load topics dynamically -->
+        <ion-select-option *ngFor="let topic of topics" [value]="topic.id">
+          {{ topic.name }}
+        </ion-select-option>
       </ion-select>
     </div>
   </div>

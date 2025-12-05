@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { AdminAuthService } from '../../../core/services/admin-auth.service';
-import { Observable, interval } from 'rxjs';
+import { Observable, Subject, interval } from 'rxjs';
 import { AdminUser } from '../../../core/models/admin.model';
+import { takeUntil } from 'rxjs/operators';
 
 /**
  * Admin Layout Component
@@ -23,20 +24,29 @@ import { AdminUser } from '../../../core/models/admin.model';
   standalone: true,
   imports: [CommonModule, IonicModule, RouterModule]
 })
-export class AdminLayoutComponent implements OnInit {
+export class AdminLayoutComponent implements OnInit, OnDestroy {
   private authService = inject(AdminAuthService);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
   currentUser$!: Observable<AdminUser | null>;
   sessionWarning = false;
+  readonly splitPaneWhen = '(min-width: 768px)';
 
   ngOnInit() {
     this.currentUser$ = this.authService.getCurrentUser();
     
     // Check session every 60 seconds
-    interval(60000).subscribe(() => {
-      this.checkSessionTimeout();
-    });
+    interval(60000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.checkSessionTimeout();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   /**

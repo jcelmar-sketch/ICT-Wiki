@@ -30,15 +30,14 @@
 
       <!-- Email Field -->
       <ion-item lines="full" [class.ion-invalid]="hasError('email', 'required') || hasError('email', 'email')">
-        <ion-label position="floating">Email</ion-label>
         <ion-input
+          label="Email"
+          labelPlacement="floating"
           type="email"
           formControlName="email"
           placeholder="admin@example.com"
           autocomplete="email"
           [clearInput]="true"
-          aria-label="Email address"
-          aria-required="true"
         ></ion-input>
         <ion-note slot="error" *ngIf="hasError('email', 'required')">
           Email is required
@@ -50,15 +49,14 @@
 
       <!-- Password Field -->
       <ion-item lines="full" [class.ion-invalid]="hasError('password', 'required') || hasError('password', 'minlength')">
-        <ion-label position="floating">Password</ion-label>
         <ion-input
+          label="Password"
+          labelPlacement="floating"
           type="password"
           formControlName="password"
           placeholder="Enter your password"
           autocomplete="current-password"
           [clearInput]="true"
-          aria-label="Password"
-          aria-required="true"
         ></ion-input>
         <ion-note slot="error" *ngIf="hasError('password', 'required')">
           Password is required

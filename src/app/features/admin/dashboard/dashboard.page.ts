@@ -3,14 +3,16 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { DashboardMetricsService, DashboardMetrics, ActivityFeedItem } from '../../../core/services/dashboard-metrics.service';
+import { DashboardMetricsService, DashboardMetrics } from '../../../core/services/dashboard-metrics.service';
+import { ActivityLogService } from '../../../core/services/activity-log.service';
+import { ActivityLog } from '../../../core/models/activity-log.model';
 import { MetricCardComponent } from '../shared/metric-card/metric-card.component';
 
 /**
  * Admin Dashboard Page
  * Task T039, T043: Main landing page showing metrics and activity feed
  * 
- * Displays real-time metrics with 5-minute cache and activity feed updating every 30 seconds.
+ * Displays real-time metrics with 5-minute cache and activity feed.
  */
 @Component({
   selector: 'app-dashboard',
@@ -22,13 +24,22 @@ import { MetricCardComponent } from '../shared/metric-card/metric-card.component
 export class DashboardPage implements OnInit, OnDestroy {
   private router = inject(Router);
   private metricsService = inject(DashboardMetricsService);
+  private activityService = inject(ActivityLogService);
   
   metrics: DashboardMetrics | null = null;
-  activities: ActivityFeedItem[] = [];
+  activities: ActivityLog[] = [];
   loading = true;
+  
+  // Pagination for activity feed
+  currentPage = 1;
+  pageSize = 5;
+  totalActivities = 0;
   
   private metricsSubscription?: Subscription;
   private activitySubscription?: Subscription;
+
+  // Expose Math to template
+  Math = Math;
 
   ngOnInit() {
     // Load metrics with 5-minute cache (T037)
@@ -43,21 +54,46 @@ export class DashboardPage implements OnInit, OnDestroy {
       }
     });
 
-    // Load activity feed with 30-second refresh (T037)
-    this.activitySubscription = this.metricsService.getActivityFeed(20).subscribe({
-      next: (activities) => {
-        this.activities = activities;
-      },
-      error: (error) => {
-        console.error('Error loading activity feed:', error);
-      }
-    });
+    this.loadActivityFeed();
   }
   
   ngOnDestroy() {
     this.metricsSubscription?.unsubscribe();
     this.activitySubscription?.unsubscribe();
     this.metricsService.stopActivityFeedPolling();
+  }
+
+  loadActivityFeed() {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    this.activitySubscription = this.activityService.getRecentActivity({
+      limit: this.pageSize,
+      offset: (this.currentPage - 1) * this.pageSize,
+      start_date: yesterday
+    }).subscribe({
+      next: (response) => {
+        this.activities = response.logs;
+        this.totalActivities = response.total;
+      },
+      error: (error) => {
+        console.error('Error loading activity feed:', error);
+      }
+    });
+  }
+
+  nextPage() {
+    if (this.currentPage * this.pageSize < this.totalActivities) {
+      this.currentPage++;
+      this.loadActivityFeed();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadActivityFeed();
+    }
   }
   
   /**
