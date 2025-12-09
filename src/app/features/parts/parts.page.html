@@ -37,6 +37,29 @@
       </ion-select-option>
     </ion-select>
   </ion-toolbar>
+
+  <!-- Sort Filter -->
+  <ion-toolbar class="sort-toolbar">
+    <div class="sort-container">
+      <span class="sort-label">Sort By:</span>
+      <ion-segment 
+        [(ngModel)]="sortOrder" 
+        (ionChange)="onSortOrderChange(sortOrder)"
+        mode="md"
+        class="sort-segment"
+      >
+        <ion-segment-button value="latest">
+          <ion-label>Latest First</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="oldest">
+          <ion-label>Oldest First</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="name">
+          <ion-label>Name A-Z</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content>

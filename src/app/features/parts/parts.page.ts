@@ -25,6 +25,7 @@ export class PartsPage implements OnInit {
 
   parts: ComputerPart[] = [];
   selectedCategory: PartCategory | 'all' = 'all';
+  sortOrder: 'latest' | 'oldest' | 'name' = 'latest';
   loading = true;
   loadingMore = false;
   
@@ -81,6 +82,26 @@ export class PartsPage implements OnInit {
   onCategoryChange(event: any) {
     this.selectedCategory = event.detail.value;
     this.loadParts(true);
+  }
+
+  onSortOrderChange(sortOrder: 'latest' | 'oldest' | 'name') {
+    this.sortOrder = sortOrder;
+    this.applySort();
+  }
+
+  private applySort() {
+    this.parts.sort((a, b) => {
+      switch (this.sortOrder) {
+        case 'latest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'name':
+          return a.name.localeCompare(b.name);
+        default:
+          return 0;
+      }
+    });
   }
 
   getSpecsCount(specs: any): number {

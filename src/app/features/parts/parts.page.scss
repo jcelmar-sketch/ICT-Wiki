@@ -84,6 +84,67 @@ ion-segment-button {
   }
 }
 
+// Sort Toolbar & Segment
+.sort-toolbar {
+  --background: transparent;
+  --border-color: var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+.sort-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-text-color);
+  white-space: nowrap;
+}
+
+.sort-segment {
+  --background: var(--ion-color-light);
+  flex: 1;
+  
+  ion-segment-button {
+    min-height: 36px;
+    font-size: 13px;
+    
+    &::part(native) {
+      color: var(--ion-text-color);
+    }
+    
+    &::part(indicator-background) {
+      background: var(--ion-color-primary);
+    }
+    
+    ion-label {
+      color: inherit;
+      font-weight: 500;
+    }
+  }
+  
+  // Ensure text is readable in unselected state
+  ion-segment-button:not(.segment-button-checked) {
+    ion-label {
+      color: var(--ion-text-color);
+      opacity: 0.8;
+    }
+  }
+  
+  // Enhanced contrast for selected state
+  ion-segment-button.segment-button-checked {
+    ion-label {
+      color: #ffffff;
+      font-weight: 600;
+    }
+  }
+}
+
 // Parts Grid
 .parts-grid {
   display: grid;

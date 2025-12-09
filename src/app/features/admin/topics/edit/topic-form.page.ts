@@ -40,7 +40,7 @@ export class TopicFormPage implements OnInit {
       slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
       description: [''],
       icon: ['folder-outline'],
-      order: [0, [Validators.required, Validators.min(0)]]
+      display_order: [1, [Validators.required, Validators.min(1)]]
     });
   }
 
@@ -61,7 +61,7 @@ export class TopicFormPage implements OnInit {
           slug: topic.slug,
           description: topic.description,
           icon: topic.icon,
-          order: topic.order
+          display_order: topic.order
         });
         this.loading = false;
       },

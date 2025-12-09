@@ -210,6 +210,15 @@ export class ArticlesAdminService {
   }
 
   /**
+   * Delete article (alias for softDelete)
+   * @param id - Article UUID
+   * @returns Observable of void
+   */
+  delete(id: string): Observable<void> {
+    return this.softDelete(id);
+  }
+
+  /**
    * Restore article from trash
    * @param id - Article UUID
    * @returns Observable of void

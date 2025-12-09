@@ -17,7 +17,7 @@ export interface TopicFormData {
   slug: string;
   description?: string;
   icon?: string;
-  order: number;
+  display_order: number;
 }
 
 @Injectable({
@@ -28,6 +28,7 @@ export class TopicsAdminService {
 
   /**
    * List all topics with article counts
+   * Admins see all topics (including soft-deleted for restoration)
    * @returns Observable of topics array
    */
   list(): Observable<Topic[]> {
@@ -35,42 +36,40 @@ export class TopicsAdminService {
       (async () => {
         const client = this.supabase.getClient();
         
-        // Get topics
+        // Get topics - admins see all, ordered by display_order
         const { data: topics, error: topicsError } = await client
           .from('topics')
           .select('*')
-          .is('deleted_at', null)
-          .order('order', { ascending: true });
+          .order('display_order', { ascending: true });
 
         if (topicsError) {
           throw new Error(`Failed to list topics: ${topicsError.message}`);
         }
 
-        // Get article counts for each topic
-        // Note: In a larger app, this might be a view or a separate query
-        // For now, we'll do a count query for each topic or a group by
-        // A more efficient way is to use a view or a subquery if Supabase supports it easily in JS client
-        // Or we can fetch all article-topic relations.
-        // Let's try a join if possible, or just separate counts if list is small (topics are usually few)
-        
-        // Alternative: Select count of articles
-        // .select('*, articles(count)') -> this works if foreign key is set up correctly
-        
-        const topicsWithCounts = await Promise.all(topics.map(async (topic) => {
-          const { count, error: countError } = await client
-            .from('articles')
-            .select('*', { count: 'exact', head: true })
-            .eq('topic_id', topic.id)
-            .is('deleted_at', null);
-            
-          if (countError) {
-            console.warn(`Failed to get count for topic ${topic.id}`, countError);
-            return { ...topic, article_count: 0 };
-          }
-          
-          return { ...topic, article_count: count || 0 };
-        }));
+        if (!topics || topics.length === 0) {
+          console.log('No topics found in database');
+          return [];
+        }
 
+        // Get article counts for each topic (only active articles)
+        const topicsWithCounts = await Promise.all(
+          topics.map(async (topic) => {
+            const { count, error: countError } = await client
+              .from('articles')
+              .select('*', { count: 'exact', head: true })
+              .eq('topic_id', topic.id)
+              .is('deleted_at', null);
+              
+            if (countError) {
+              console.warn(`Failed to get count for topic ${topic.id}`, countError);
+              return { ...topic, article_count: 0 };
+            }
+            
+            return { ...topic, article_count: count || 0 };
+          })
+        );
+
+        console.log('Topics with counts:', topicsWithCounts);
         return topicsWithCounts as Topic[];
       })()
     ).pipe(
@@ -127,7 +126,7 @@ export class TopicsAdminService {
             slug: formData.slug,
             description: formData.description,
             icon: formData.icon,
-            order: formData.order,
+            display_order: formData.display_order,
           })
           .select()
           .single();
@@ -164,7 +163,7 @@ export class TopicsAdminService {
             slug: formData.slug,
             description: formData.description,
             icon: formData.icon,
-            order: formData.order,
+            display_order: formData.display_order,
           })
           .eq('id', id)
           .select()

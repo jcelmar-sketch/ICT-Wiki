@@ -46,16 +46,15 @@ export class PartsAdminService {
         let query = client
           .from('computer_parts')
           .select('*')
-          .is('deleted_at', null)
           .order('created_at', { ascending: false });
 
         // Apply filters
         if (part_type) {
-          query = query.eq('part_type', part_type);
+          query = query.eq('category', part_type);
         }
 
         if (brand) {
-          query = query.ilike('brand', `%${brand}%`);
+          query = query.ilike('manufacturer', `%${brand}%`);
         }
 
         if (search) {
@@ -127,12 +126,11 @@ export class PartsAdminService {
           .insert({
             name: formData.name,
             slug: formData.slug,
-            part_type: formData.part_type,
-            brand: formData.brand,
+            category: formData.part_type,
+            manufacturer: formData.brand,
             description: formData.description,
-            specs: formData.specs,
-            images: formData.images,
-            price: formData.price,
+            specs_json: formData.specs,
+            image: formData.images?.[0] || null,
           })
           .select()
           .single();
@@ -167,12 +165,11 @@ export class PartsAdminService {
           .update({
             name: formData.name,
             slug: formData.slug,
-            part_type: formData.part_type,
-            brand: formData.brand,
+            category: formData.part_type,
+            manufacturer: formData.brand,
             description: formData.description,
-            specs: formData.specs,
-            images: formData.images,
-            price: formData.price,
+            specs_json: formData.specs,
+            image: formData.images?.[0] || null,
             updated_at: new Date().toISOString(),
           })
           .eq('id', id)
@@ -258,8 +255,7 @@ export class PartsAdminService {
         let query = client
           .from('computer_parts')
           .select('id')
-          .eq('slug', slug)
-          .is('deleted_at', null);
+          .eq('slug', slug);
 
         if (excludeId) {
           query = query.neq('id', excludeId);
@@ -339,16 +335,17 @@ export class PartsAdminService {
         const client = this.supabase.getClient();
         const { data, error } = await client
           .from('computer_parts')
-          .select('brand')
-          .is('deleted_at', null)
-          .order('brand');
+          .select('manufacturer');
 
         if (error) {
           throw new Error(`Failed to get brands: ${error.message}`);
         }
 
-        // Extract unique brands
-        const brands = [...new Set(data.map((item: any) => item.brand))];
+        // Extract unique manufacturers (brands)
+        const brands = [...new Set(data
+          .map((item: any) => item.manufacturer)
+          .filter((manufacturer: string | null): manufacturer is string => manufacturer !== null))]
+          .sort();
         return brands;
       })()
     ).pipe(

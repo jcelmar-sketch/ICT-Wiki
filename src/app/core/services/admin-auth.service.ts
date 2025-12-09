@@ -293,6 +293,162 @@ export class AdminAuthService {
     return of(true);
   }
 
+  /**
+   * Update admin password
+   * 
+   * @param currentPassword Current password for verification
+   * @param newPassword New password to set
+   * @returns Observable of success or error message
+   */
+  updatePassword(currentPassword: string, newPassword: string): Observable<{ success: boolean; message: string }> {
+    return from(this.performPasswordUpdate(currentPassword, newPassword)).pipe(
+      catchError(error => {
+        console.error('Password update error:', error);
+        return of({
+          success: false,
+          message: error.message || 'Failed to update password. Please try again.'
+        });
+      })
+    );
+  }
+
+  private async performPasswordUpdate(currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const session = this.currentSessionSubject.value;
+      if (!session) {
+        return { success: false, message: 'No active session' };
+      }
+
+      // Verify current password by attempting to re-authenticate
+      const { error: authError } = await this.supabase.auth.signInWithPassword({
+        email: session.user.email,
+        password: currentPassword
+      });
+
+      if (authError) {
+        return { success: false, message: 'Current password is incorrect' };
+      }
+
+      // Update password in Supabase Auth
+      const { error: updateError } = await this.supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) {
+        return { success: false, message: updateError.message };
+      }
+
+      // Log the password change
+      await this.supabase
+        .from('activity_logs')
+        .insert({
+          admin_id: session.user.id,
+          admin_email: session.user.email,
+          action_type: 'password_changed',
+          item_type: null,
+          item_id: null,
+          item_title: null
+        });
+
+      return { success: true, message: 'Password updated successfully' };
+    } catch (error: any) {
+      console.error('Password update exception:', error);
+      return { success: false, message: 'An unexpected error occurred' };
+    }
+  }
+
+  /**
+   * Update admin email address
+   * 
+   * @param newEmail New email address
+   * @param password Current password for verification
+   * @returns Observable of success or error message
+   */
+  updateEmail(newEmail: string, password: string): Observable<{ success: boolean; message: string }> {
+    return from(this.performEmailUpdate(newEmail, password)).pipe(
+      catchError(error => {
+        console.error('Email update error:', error);
+        return of({
+          success: false,
+          message: error.message || 'Failed to update email. Please try again.'
+        });
+      })
+    );
+  }
+
+  private async performEmailUpdate(newEmail: string, password: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const session = this.currentSessionSubject.value;
+      if (!session) {
+        return { success: false, message: 'No active session' };
+      }
+
+      // Verify password first
+      const { error: authError } = await this.supabase.auth.signInWithPassword({
+        email: session.user.email,
+        password
+      });
+
+      if (authError) {
+        return { success: false, message: 'Password is incorrect' };
+      }
+
+      // Check if new email is already in use
+      const { data: existingUser } = await this.supabase
+        .from('admin_users')
+        .select('id')
+        .eq('email', newEmail)
+        .neq('id', session.user.id)
+        .single();
+
+      if (existingUser) {
+        return { success: false, message: 'Email address is already in use' };
+      }
+
+      // Update email in Supabase Auth
+      const { error: updateError } = await this.supabase.auth.updateUser({
+        email: newEmail
+      });
+
+      if (updateError) {
+        return { success: false, message: updateError.message };
+      }
+
+      // Update email in admin_users table
+      const { error: dbError } = await this.supabase
+        .from('admin_users')
+        .update({ email: newEmail, updated_at: new Date().toISOString() })
+        .eq('id', session.user.id);
+
+      if (dbError) {
+        return { success: false, message: dbError.message };
+      }
+
+      // Update current session with new email
+      const updatedSession = { ...session };
+      updatedSession.user.email = newEmail;
+      updatedSession.user.updated_at = new Date().toISOString();
+      this.currentSessionSubject.next(updatedSession);
+
+      // Log the email change
+      await this.supabase
+        .from('activity_logs')
+        .insert({
+          admin_id: session.user.id,
+          admin_email: newEmail,
+          action_type: 'email_changed',
+          item_type: null,
+          item_id: null,
+          item_title: null
+        });
+
+      return { success: true, message: 'Email updated successfully. Please log in again with your new email.' };
+    } catch (error: any) {
+      console.error('Email update exception:', error);
+      return { success: false, message: 'An unexpected error occurred' };
+    }
+  }
+
   // Private helper methods
 
   private async fetchAdminUser(userId: string): Promise<AdminUser | null> {

@@ -103,8 +103,8 @@ async function seedData() {
     // Create test admin user in Auth
     const { data: authUser, error: authError } =
       await supabase.auth.admin.createUser({
-        email: 'admin@ict-wiki.local',
-        password: 'TestAdmin123!',
+        email: 'admin@ict.local',
+        password: 'Admin123!',
         email_confirm: true,
       });
 
@@ -119,10 +119,8 @@ async function seedData() {
     if (!adminId) {
       const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
       if (!listError) {
-        const existingUser = users.find(u => u.email === 'admin@ict-wiki.local');
-        adminId = existingUser?.id || 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-      } else {
-        adminId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
+        const existingUser = users.find(u => u.email === 'admin@ict.local');
+        adminId = existingUser?.id;
       }
     }
     
@@ -132,7 +130,7 @@ async function seedData() {
     const { error: adminError } = await supabase.from('admin_users').upsert([
       {
         id: adminId,
-        email: 'admin@ict-wiki.local',
+        email: 'admin@ict.local',
         role: 'admin',
         failed_login_attempts: 0,
         last_login_at: new Date().toISOString(),
@@ -143,6 +141,8 @@ async function seedData() {
     await log('Admin user added to database', 'success');
 
     // Seed topics (not categories)
+    // Note: Some database schemas use 'order', others use 'display_order'
+    // We'll include both to be compatible with either schema
     const { error: topicError } = await supabase
       .from('topics')
       .upsert([
@@ -152,6 +152,7 @@ async function seedData() {
           description: 'Computer hardware, architecture, and systems',
           icon: 'desktop-outline',
           order: 1,
+          display_order: 1,
         },
         {
           name: 'Network',
@@ -159,6 +160,7 @@ async function seedData() {
           description: 'Networking protocols, infrastructure, and security',
           icon: 'share-social-outline',
           order: 2,
+          display_order: 2,
         },
         {
           name: 'Software',
@@ -166,6 +168,7 @@ async function seedData() {
           description: 'Software development, tools, and methodologies',
           icon: 'code-slash-outline',
           order: 3,
+          display_order: 3,
         },
       ], { onConflict: 'slug' });
 
@@ -212,6 +215,7 @@ async function seedData() {
         category: 'cpu',
         manufacturer: 'Intel',
         description: 'High-performance desktop processor with 24 cores (8 P-cores + 16 E-cores) and up to 5.8 GHz boost clock. Ideal for gaming, content creation, and heavy multitasking workloads.',
+        image: 'https://via.placeholder.com/400x300?text=Intel+i9-13900K',
         specs_json: { cores: 24, threads: 32, base_clock: '3.0 GHz', boost_clock: '5.8 GHz', tdp: '253W', socket: 'LGA1700' },
       },
       {
@@ -220,6 +224,7 @@ async function seedData() {
         category: 'cpu',
         manufacturer: 'AMD',
         description: 'High-end Ryzen processor with 8 cores and 16 threads, built on 5nm process technology. Features excellent multi-threaded performance with support for DDR5 and PCIe 5.0.',
+        image: 'https://via.placeholder.com/400x300?text=AMD+Ryzen+7700X',
         specs_json: { cores: 8, threads: 16, base_clock: '4.5 GHz', boost_clock: '5.4 GHz', tdp: '105W', socket: 'AM5' },
       },
       {
@@ -228,6 +233,7 @@ async function seedData() {
         category: 'ram',
         manufacturer: 'Corsair',
         description: 'High-performance DDR5 memory kit with 32GB capacity running at 6000 MHz. Perfect for demanding gaming and creative workloads with low CL30 latency.',
+        image: 'https://via.placeholder.com/400x300?text=Corsair+DDR5+32GB',
         specs_json: { capacity: '32GB', type: 'DDR5', speed: '6000 MHz', cas_latency: 'CL30', voltage: '1.35V' },
       },
       {
@@ -236,6 +242,7 @@ async function seedData() {
         category: 'storage',
         manufacturer: 'Samsung',
         description: 'High-speed NVMe SSD with PCIe 4.0 interface delivering exceptional read/write speeds up to 7450 MB/s. Enterprise-grade reliability with advanced thermal control.',
+        image: 'https://via.placeholder.com/400x300?text=Samsung+990+Pro+2TB',
         specs_json: { capacity: '2TB', interface: 'NVMe PCIe 4.0 x4', speed_read: '7450 MB/s', speed_write: '6900 MB/s', form_factor: 'M.2 2280' },
       },
       {
@@ -244,6 +251,7 @@ async function seedData() {
         category: 'gpu',
         manufacturer: 'NVIDIA',
         description: 'Flagship gaming graphics card with 24GB GDDR6X memory and 16384 CUDA cores. Delivers exceptional 4K gaming performance with ray tracing and DLSS 3.0 support.',
+        image: 'https://via.placeholder.com/400x300?text=NVIDIA+RTX+4090',
         specs_json: { memory: '24GB GDDR6X', cuda_cores: 16384, boost_clock: '2.52 GHz', power_consumption: '450W', outputs: ['HDMI 2.1', 'DisplayPort 1.4a'] },
       },
       {
@@ -252,13 +260,59 @@ async function seedData() {
         category: 'motherboard',
         manufacturer: 'ASUS',
         description: 'Premium gaming motherboard with robust power delivery, PCIe 5.0 support, Wi-Fi 6E, and comprehensive connectivity options for high-end Intel builds.',
+        image: 'https://via.placeholder.com/400x300?text=ASUS+ROG+Z790-E',
         specs_json: { socket: 'LGA1700', chipset: 'Intel Z790', form_factor: 'ATX', memory_slots: 4, max_memory: '128GB', pcie_slots: ['PCIe 5.0 x16', 'PCIe 4.0 x16'] },
+      },
+      {
+        name: 'Corsair RM1000e 1000W',
+        slug: 'corsair-rm1000e',
+        category: 'psu',
+        manufacturer: 'Corsair',
+        description: '80+ Gold certified modular power supply with 1000W output. Features low-noise operation, digital monitoring via Corsair iMON, and silent fan mode for efficient power delivery.',
+        image: 'https://via.placeholder.com/400x300?text=Corsair+RM1000e',
+        specs_json: { wattage: '1000W', certification: '80+ Gold', modular: 'Fully Modular', fan_size: '135mm', voltage: '100-240V AC' },
+      },
+      {
+        name: 'Noctua NH-D15S',
+        slug: 'noctua-nh-d15s',
+        category: 'cooling',
+        manufacturer: 'Noctua',
+        description: 'Premium dual-tower air cooler with SecuFirm2 mounting system. Provides excellent cooling performance with near-silent operation for high-end processors.',
+        image: 'https://via.placeholder.com/400x300?text=Noctua+NH-D15S',
+        specs_json: { type: 'Air', height: '160mm', weight: '680g', tdp: '250W', noise_level: '19.2 dB' },
+      },
+      {
+        name: 'Lian Li LANCOOL 3',
+        slug: 'lian-li-lancool-3',
+        category: 'case',
+        manufacturer: 'Lian Li',
+        description: 'Mid-tower ATX case with tempered glass panel, excellent airflow, and cable management options. Supports up to 7 fans and GPU length up to 330mm.',
+        image: 'https://via.placeholder.com/400x300?text=Lian+Li+LANCOOL+3',
+        specs_json: { type: 'Mid-Tower', form_factor: 'ATX', material: 'Aluminum/Steel', fans_included: 2, max_gpu_length: '330mm' },
+      },
+      {
+        name: 'Logitech MX Master 3S',
+        slug: 'logitech-mx-master-3s',
+        category: 'peripherals',
+        manufacturer: 'Logitech',
+        description: 'Advanced wireless mouse with precision scrolling, customizable buttons, and multi-device connectivity. Perfect for productivity and creative professionals.',
+        image: 'https://via.placeholder.com/400x300?text=Logitech+MX+Master+3S',
+        specs_json: { connection: 'Wireless 2.4GHz + Bluetooth', dpi: '8000', buttons: 8, battery_life: '70 days', color: 'Graphite' },
+      },
+      {
+        name: 'Mechanical Keyboard - Keychron Q1',
+        slug: 'keychron-q1',
+        category: 'peripherals',
+        manufacturer: 'Keychron',
+        description: 'Premium mechanical keyboard with fully customizable switches, wireless connectivity, and aluminum frame. Ideal for gaming and typing enthusiasts.',
+        image: 'https://via.placeholder.com/400x300?text=Keychron+Q1',
+        specs_json: { layout: '75%', switch_type: 'Hot-swap', connection: 'Wireless/Wired', backlight: 'RGB', material: 'Aluminum' },
       },
     ], { onConflict: 'slug' });
 
     if (partError && !partError.message.includes('duplicate'))
       throw partError;
-    await log('6 Computer Parts seeded (CPUs, RAM, Storage, GPU, Motherboard)', 'success');
+    await log('12 Computer Parts seeded (CPUs, RAM, Storage, GPU, Motherboard, PSU, Cooling, Case, Peripherals)', 'success');
   } catch (err) {
     await log(`Seeding error: ${err.message}`, 'error');
     throw err;
@@ -317,8 +371,8 @@ async function main() {
 
     console.log('\n✨ Setup Complete!\n');
     console.log('Test Credentials:');
-    console.log('  Email: admin@ict-wiki.local');
-    console.log('  Password: TestAdmin123!');
+    console.log('  Email: admin@ict.local');
+    console.log('  Password: Admin123!');
     console.log(
       '\n⚠️  Migration Warning: Migrations could not be auto-executed via JS SDK.'
     );

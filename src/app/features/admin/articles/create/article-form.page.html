@@ -36,10 +36,9 @@
       <ion-item [class.ion-invalid]="hasError('topic_id', 'required')">
         <ion-label position="stacked">Topic *</ion-label>
         <ion-select formControlName="topic_id" placeholder="Select topic">
-          <!-- TODO: Load topics dynamically -->
-          <ion-select-option value="topic-1">Computer</ion-select-option>
-          <ion-select-option value="topic-2">Network</ion-select-option>
-          <ion-select-option value="topic-3">Software</ion-select-option>
+          <ion-select-option *ngFor="let topic of topics" [value]="topic.id">
+            {{ topic.name }}
+          </ion-select-option>
         </ion-select>
         <div class="error-message" *ngIf="articleForm.get('topic_id')?.touched && articleForm.get('topic_id')?.invalid">
           {{ getErrorMessage('topic_id') }}

@@ -54,9 +54,9 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [x] T013 Create ActivityLogService in `src/app/core/services/activity-log.service.ts` with log(), getRecentActivity(), filter() methods
 - [x] T014 Create AdminApiService base in `src/app/core/services/admin-api.service.ts` with common CRUD methods and error handling
 - [x] T015 [P] Extend SupabaseService in `src/app/core/services/supabase.service.ts` to expose admin auth methods
-- [ ] T016 [P] Unit test AdminAuthService in `src/app/core/services/admin-auth.service.spec.ts` covering login success/failure, lockout, session expiry, session timeout detection, localStorage preservation
-- [ ] T017 [P] Unit test AdminAuthGuard in `src/app/core/guards/admin-auth.guard.spec.ts` covering redirect scenarios (unauthenticated → /admin/login, authenticated → allow, expired session → /admin/login with returnUrl)
-- [ ] T018 [P] Unit test ActivityLogService in `src/app/core/services/activity-log.service.spec.ts` covering log creation, filtering by admin/action/date, pagination, error handling
+- [x] T016 [P] Unit test AdminAuthService in `src/app/core/services/admin-auth.service.spec.ts` covering login success/failure, lockout, session expiry, session timeout detection, localStorage preservation
+- [x] T017 [P] Unit test AdminAuthGuard in `src/app/core/guards/admin-auth.guard.spec.ts` covering redirect scenarios (unauthenticated → /admin/login, authenticated → allow, expired session → /admin/login with returnUrl)
+- [x] T018 [P] Unit test ActivityLogService in `src/app/core/services/activity-log.service.spec.ts` covering log creation, filtering by admin/action/date, pagination, error handling
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -83,7 +83,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [x] T026 [P] [US1] Create ForgotPasswordPage template in `src/app/features/admin/auth/forgot-password/forgot-password.page.html`
 - [x] T027 [US1] Implement login logic in LoginPage: form submission, validation, AdminAuthService.login() call, error handling, redirect to dashboard
 - [x] T028 [US1] Implement session timeout detection: use RxJS interval to check session expiry every 60 seconds, preserve form data in localStorage on expiry using key format `admin_form_{formType}_{itemId}` with JSON value `{formData: {...}, savedAt: timestamp, expiresAt: timestamp + 24h}`. Restore data after re-login, clear on explicit logout
-- [ ] T028a [US1] Unit test for localStorage form preservation in `src/app/core/services/admin-auth.service.spec.ts` covering: form data saved with 24h expiry, data restored after re-login, expired data purged, sensitive fields (password) excluded, localStorage cleared on explicit logout
+- [x] T028a [US1] Unit test for localStorage form preservation in `src/app/core/services/admin-auth.service.spec.ts` covering: form data saved with 24h expiry, data restored after re-login, expired data purged, sensitive fields (password) excluded, localStorage cleared on explicit logout
 - [x] T029 [US1] Implement account lockout UI: show lockout message when AdminAuthService returns locked error, display countdown timer
 - [x] T030 [US1] Implement forgot password logic in ForgotPasswordPage: call Supabase Auth recover endpoint, show success message
 - [ ] T030a [US1] Integration test for forgot password flow in `src/app/features/admin/auth/forgot-password/forgot-password.page.spec.ts` covering: email sent successfully, invalid email error, rate limiting (max 3 per hour)
@@ -110,7 +110,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 ### Implementation for User Story 2
 
 - [x] T037 [P] [US2] Create DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.ts` with getMetrics(), getActivityFeed() using RxJS ReplaySubject cache
-- [ ] T038 [P] [US2] Unit test DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.spec.ts` covering cache TTL, activity polling
+- [x] T038 [P] [US2] Unit test DashboardMetricsService in `src/app/core/services/dashboard-metrics.service.spec.ts` covering cache TTL, activity polling
 - [x] T039 [P] [US2] Create DashboardPage component in `src/app/features/admin/dashboard/dashboard.page.ts` with metrics$ and activityFeed$ observables
 - [x] T040 [P] [US2] Create MetricCardComponent in `src/app/features/admin/shared/metric-card/metric-card.component.ts` as reusable card with label, value, icon, warning state
 - [x] T041 [P] [US2] Create AdminHeaderComponent in `src/app/features/admin/shared/header/header.component.ts` with admin email display and logout button
@@ -144,7 +144,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 - [x] T054 [P] [US3] Extend Article model in `src/app/core/models/article.model.ts` to add author_id, status, deleted_at fields
 - [x] T055 [P] [US3] Create ArticlesAdminService in `src/app/core/services/articles-admin.service.ts` with list(), get(), create(), update(), softDelete(), restore() methods
-- [ ] T056 [P] [US3] Unit test ArticlesAdminService in `src/app/core/services/articles-admin.service.spec.ts` covering CRUD operations and error handling
+- [x] T056 [P] [US3] Unit test ArticlesAdminService in `src/app/core/services/articles-admin.service.spec.ts` covering CRUD operations and error handling
 - [x] T057 [P] [US3] Create ArticleListPage component in `src/app/features/admin/articles/list/article-list.page.ts` with filters (category, status, search) and pagination
 - [x] T058 [P] [US3] Create ArticleListPage template in `src/app/features/admin/articles/list/article-list.page.html` with ion-searchbar, filter selects, article cards, pagination
 - [x] T059 [P] [US3] Create ArticleFormPage component in `src/app/features/admin/articles/create/article-form.page.ts` with reactive form (title, slug, category, tags, content, status)
@@ -163,7 +163,7 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [x] T071 [US3] Add article management routes to `src/app/app.routes.ts` under /admin/articles (list, create, edit/:id)
 - [x] T072 [US3] Update `docs/user-guide.md` adding "Article Management" section with create/edit/delete workflows, markdown tips, slug best practices
 - [x] T073 [US3] Create ADR-004 in `docs/adr/004-markdown-sanitization.md` documenting DOMPurify configuration, allowed tags, XSS prevention
-- [ ] T073a [US3] Security test for markdown sanitization in `src/app/features/admin/articles/components/markdown-editor/markdown-editor.component.spec.ts` covering: XSS prevention with malicious script tags, dangerous attributes (onerror, onclick) stripped, safe HTML preserved (headings, links, code blocks, lists), DOMPurify configuration matches public app
+- [x] T073a [US3] Security test for markdown sanitization in `src/app/features/admin/articles/components/markdown-editor/markdown-editor.component.spec.ts` covering: XSS prevention with malicious script tags, dangerous attributes (onerror, onclick) stripped, safe HTML preserved (headings, links, code blocks, lists), DOMPurify configuration matches public app
 - [x] T074 [US3] Update `docs/data-schema.md` adding article schema extensions (author_id, status, deleted_at columns)
 
 **Checkpoint**: At this point, User Stories 1, 2, AND 3 should all work independently. Admin dashboard has full article management capability - this is a shippable MVP!
@@ -222,21 +222,21 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 5
 
-- [ ] T100 [P] [US5] Extend Topic model in `src/app/core/models/topic.model.ts` to add deleted_at field and article_count property
-- [ ] T101 [P] [US5] Create TopicsAdminService in `src/app/core/services/topics-admin.service.ts` with list(), get(), create(), update(), delete(), checkArticleCount() methods
-- [ ] T102 [P] [US5] Unit test TopicsAdminService in `src/app/core/services/topics-admin.service.spec.ts` covering delete protection logic
-- [ ] T103 [P] [US5] Create TopicListPage component in `src/app/features/admin/topics/list/topic-list.page.ts` displaying all topics with article counts
-- [ ] T104 [P] [US5] Create TopicListPage template in `src/app/features/admin/topics/list/topic-list.page.html` with topic table/cards
-- [ ] T105 [P] [US5] Create TopicFormPage component in `src/app/features/admin/topics/edit/topic-form.page.ts` with reactive form (name, slug, description)
-- [ ] T106 [US5] Create TopicFormPage template in `src/app/features/admin/topics/edit/topic-form.page.html` with name and slug inputs
-- [ ] T107 [US5] Implement topic slug auto-generation: watch name field, transform to slug, allow manual override, check uniqueness
-- [ ] T108 [US5] Implement topic save: call TopicsAdminService.create() or update(), show success toast, refresh topic list
-- [ ] T109 [US5] Implement delete protection: call checkArticleCount() before delete, if count > 0 show modal "This topic contains X articles. Reassign or confirm deletion"
-- [ ] T110 [US5] Implement article reassignment UI in delete modal: dropdown to select target topic, button to reassign all articles, then delete topic
-- [ ] T111 [US5] Implement topic permanent delete: show confirmation modal requiring "PERMANENT DELETE" typed, call TopicsAdminService.delete(), remove from all dropdowns
-- [ ] T112 [US5] Add topics management routes to `src/app/app.routes.ts` under /admin/topics (list, create, edit/:id)
-- [ ] T113 [US5] Update `docs/user-guide.md` adding "Topic Management" section with reassignment workflow, flat structure clarification
-- [ ] T114 [US5] Update `docs/data-schema.md` documenting topic cascade rules and delete protection trigger
+- [x] T100 [P] [US5] Extend Topic model in `src/app/core/models/topic.model.ts` to add deleted_at field and article_count property
+- [x] T101 [P] [US5] Create TopicsAdminService in `src/app/core/services/topics-admin.service.ts` with list(), get(), create(), update(), delete(), checkArticleCount() methods
+- [x] T102 [P] [US5] Unit test TopicsAdminService in `src/app/core/services/topics-admin.service.spec.ts` covering delete protection logic
+- [x] T103 [P] [US5] Create TopicListPage component in `src/app/features/admin/topics/list/topic-list.page.ts` displaying all topics with article counts
+- [x] T104 [P] [US5] Create TopicListPage template in `src/app/features/admin/topics/list/topic-list.page.html` with topic table/cards
+- [x] T105 [P] [US5] Create TopicFormPage component in `src/app/features/admin/topics/edit/topic-form.page.ts` with reactive form (name, slug, description)
+- [x] T106 [US5] Create TopicFormPage template in `src/app/features/admin/topics/edit/topic-form.page.html` with name and slug inputs
+- [x] T107 [US5] Implement topic slug auto-generation: watch name field, transform to slug, allow manual override, check uniqueness
+- [x] T108 [US5] Implement topic save: call TopicsAdminService.create() or update(), show success toast, refresh topic list
+- [x] T109 [US5] Implement delete protection: call checkArticleCount() before delete, if count > 0 show modal "This topic contains X articles. Reassign or confirm deletion"
+- [x] T110 [US5] Implement article reassignment UI in delete modal: dropdown to select target topic, button to reassign all articles, then delete topic
+- [x] T111 [US5] Implement topic permanent delete: show confirmation modal requiring "PERMANENT DELETE" typed, call TopicsAdminService.delete(), remove from all dropdowns
+- [x] T112 [US5] Add topics management routes to `src/app/app.routes.ts` under /admin/topics (list, create, edit/:id)
+- [x] T113 [US5] Update `docs/user-guide.md` adding "Topic Management" section with reassignment workflow, flat structure clarification
+- [x] T114 [US5] Update `docs/data-schema.md` documenting topic cascade rules and delete protection trigger
 
 **Checkpoint**: At this point, User Stories 1-5 should all work independently. Content organization with topics is complete.
 
@@ -256,15 +256,15 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 8
 
-- [ ] T118 [P] [US8] Implement ion-split-pane responsive behavior in admin-layout.component.ts with when="lg" breakpoint (1024px)
-- [ ] T119 [P] [US8] Create responsive CSS for AdminSidebarComponent in `src/app/features/admin/shared/sidebar/sidebar.component.scss` with desktop (full labels), tablet (icon-only), mobile (drawer)
-- [ ] T120 [P] [US8] Implement hamburger menu button in AdminHeaderComponent visible only on mobile (<768px) triggering ion-menu
-- [ ] T121 [US8] Test and adjust all form layouts (article, part, category) to stack vertically on mobile, ensure adequate spacing for touch targets
-- [ ] T122 [US8] Test image upload on mobile: enable camera access, allow selecting from photo library, show appropriate mobile UI
-- [ ] T123 [US8] Test markdown editor on mobile: ensure textarea resizes properly, preview pane scrollable, keyboard doesn't obscure inputs
-- [ ] T124 [US8] Implement mobile-specific optimizations: increase button sizes, simplify metric card layouts, adjust pagination controls for touch
-- [ ] T125 [US8] Update `docs/design-system.md` documenting responsive breakpoints (desktop >1024px, tablet 768-1024px, mobile <768px) and mobile patterns
-- [ ] T126 [US8] Update `docs/user-guide.md` adding note "Admin dashboard fully supports mobile access. All features available on phones and tablets."
+- [x] T118 [P] [US8] Implement ion-split-pane responsive behavior in admin-layout.component.ts with when="lg" breakpoint (1024px)
+- [x] T119 [P] [US8] Create responsive CSS for AdminSidebarComponent in `src/app/features/admin/shared/sidebar/sidebar.component.scss` with desktop (full labels), tablet (icon-only), mobile (drawer)
+- [x] T120 [P] [US8] Implement hamburger menu button in AdminHeaderComponent visible only on mobile (<768px) triggering ion-menu
+- [x] T121 [US8] Test and adjust all form layouts (article, part, category) to stack vertically on mobile, ensure adequate spacing for touch targets
+- [x] T122 [US8] Test image upload on mobile: enable camera access, allow selecting from photo library, show appropriate mobile UI
+- [x] T123 [US8] Test markdown editor on mobile: ensure textarea resizes properly, preview pane scrollable, keyboard doesn't obscure inputs
+- [x] T124 [US8] Implement mobile-specific optimizations: increase button sizes, simplify metric card layouts, adjust pagination controls for touch
+- [x] T125 [US8] Update `docs/design-system.md` documenting responsive breakpoints (desktop >1024px, tablet 768-1024px, mobile <768px) and mobile patterns
+- [x] T126 [US8] Update `docs/user-guide.md` adding note "Admin dashboard fully supports mobile access. All features available on phones and tablets."
 
 **Checkpoint**: At this point, admin dashboard is fully responsive and accessible across all device sizes.
 
@@ -284,16 +284,16 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 6
 
-- [ ] T130 [P] [US6] Create ActivityPage component in `src/app/features/admin/activity/activity.page.ts` with filters (admin, action type, date range) and pagination
-- [ ] T131 [P] [US6] Create ActivityPage template in `src/app/features/admin/activity/activity.page.html` with filter dropdowns, date pickers, activity log table
-- [ ] T132 [US6] Implement activity log display: call ActivityLogService.getRecentActivity() with filters, display in ion-list or table with timestamp, admin email, action, item type, item title
-- [ ] T133 [US6] Implement filter logic: apply admin email filter, action type filter, date range filter to SQL query parameters, update list on filter change
-- [ ] T134 [US6] Implement pagination for activity log: default 50 items per page, prev/next buttons, page number display
-- [ ] T135 [US6] Implement date range picker: default to last 30 days, allow selecting custom range, max 90 days (data retention policy)
-- [ ] T136 [US6] Implement export functionality: button to export current filtered results as CSV, include all columns
-- [ ] T137 [US6] Add item-specific activity history to article/part/category detail views: show filtered activity log for that item ID in expandable section
-- [ ] T138 [US6] Add activity log routes to `src/app/app.routes.ts` under /admin/activity
-- [ ] T139 [US6] Update `docs/user-guide.md` adding "Activity Audit" section explaining logged actions, retention policy (90 days), filtering, export
+- [x] T130 [P] [US6] Create ActivityPage component in `src/app/features/admin/activity/activity.page.ts` with filters (admin, action type, date range) and pagination
+- [x] T131 [P] [US6] Create ActivityPage template in `src/app/features/admin/activity/activity.page.html` with filter dropdowns, date pickers, activity log table
+- [x] T132 [US6] Implement activity log display: call ActivityLogService.getRecentActivity() with filters, display in ion-list or table with timestamp, admin email, action, item type, item title
+- [x] T133 [US6] Implement filter logic: apply admin email filter, action type filter, date range filter to SQL query parameters, update list on filter change
+- [x] T134 [US6] Implement pagination for activity log: default 50 items per page, prev/next buttons, page number display
+- [x] T135 [US6] Implement date range picker: default to last 30 days, allow selecting custom range, max 90 days (data retention policy)
+- [x] T136 [US6] Implement export functionality: button to export current filtered results as CSV, include all columns
+- [x] T137 [US6] Add item-specific activity history to article/part/category detail views: show filtered activity log for that item ID in expandable section
+- [x] T138 [US6] Add activity log routes to `src/app/app.routes.ts` under /admin/activity
+- [x] T139 [US6] Update `docs/user-guide.md` adding "Activity Audit" section explaining logged actions, retention policy (90 days), filtering, export
 - [ ] T140 [US6] Update `docs/architecture.md` documenting activity logging triggers, cold storage export schedule (daily 2 AM UTC)
 - [ ] T141 [US6] Create ADR-006 in `docs/adr/006-audit-log-retention.md` documenting 90-day retention, daily exports, compliance requirements
 - [ ] T141a [US6] Create Supabase Edge Function in `supabase/functions/export-activity-logs/index.ts` to query logs older than 90 days, export as CSV with columns (created_at, admin_email, action_type, item_type, item_title, notes), upload to `audit-archive` Supabase Storage bucket, mark exported logs as archived=true
@@ -317,19 +317,19 @@ This is a single Angular project using Ionic framework. All paths relative to re
 
 ### Implementation for User Story 7
 
-- [ ] T145 [P] [US7] Create TrashService in `src/app/core/services/trash.service.ts` with getTrashItems(), restore(), permanentDelete() methods
+- [x] T145 [P] [US7] Create TrashService in `src/app/core/services/trash.service.ts` with getTrashItems(), restore(), permanentDelete() methods
 - [ ] T146 [P] [US7] Unit test TrashService in `src/app/core/services/trash.service.spec.ts` covering restore and permanent delete operations
-- [ ] T147 [P] [US7] Create TrashPage component in `src/app/features/admin/trash/trash.page.ts` displaying all soft-deleted items across articles, parts, categories
-- [ ] T148 [P] [US7] Create TrashPage template in `src/app/features/admin/trash/trash.page.html` with trash items table, Restore/Permanent Delete action buttons
-- [ ] T149 [US7] Implement trash items display: query all items WHERE deleted_at IS NOT NULL, show item type, title, deleted timestamp, deleted by admin email, auto-delete date (deleted_at + 30 days)
-- [ ] T150 [US7] Implement restore functionality: button calls TrashService.restore(itemType, itemId), sets deleted_at = NULL, shows success toast "Item restored", refreshes list
-- [ ] T151 [US7] Implement permanent delete confirmation modal: require typing "PERMANENT DELETE" exactly, warn "This action cannot be undone", show item details
-- [ ] T152 [US7] Implement permanent delete: call TrashService.permanentDelete(), delete associated images from Supabase Storage, remove database record, log action, show success message
-- [ ] T153 [US7] Implement auto-purge indication: show countdown "Auto-delete in X days" for each item, highlight items with <7 days remaining
+- [x] T147 [P] [US7] Create TrashPage component in `src/app/features/admin/trash/trash.page.ts` displaying all soft-deleted items across articles, parts, categories
+- [x] T148 [P] [US7] Create TrashPage template in `src/app/features/admin/trash/trash.page.html` with trash items table, Restore/Permanent Delete action buttons
+- [x] T149 [US7] Implement trash items display: query all items WHERE deleted_at IS NOT NULL, show item type, title, deleted timestamp, deleted by admin email, auto-delete date (deleted_at + 30 days)
+- [x] T150 [US7] Implement restore functionality: button calls TrashService.restore(itemType, itemId), sets deleted_at = NULL, shows success toast "Item restored", refreshes list
+- [x] T151 [US7] Implement permanent delete confirmation modal: require typing "PERMANENT DELETE" exactly, warn "This action cannot be undone", show item details
+- [x] T152 [US7] Implement permanent delete: call TrashService.permanentDelete(), delete associated images from Supabase Storage, remove database record, log action, show success message
+- [x] T153 [US7] Implement auto-purge indication: show countdown "Auto-delete in X days" for each item, highlight items with <7 days remaining
 - [ ] T154 [US7] Create Supabase Edge Function for auto-purge in `supabase/functions/trash-auto-purge/index.ts` to run daily, delete items older than 30 days. Include: error logging for failed deletions, email notification to admins 24h before purge with list of items to be deleted, retry logic (3 attempts with exponential backoff), transaction rollback on partial failure
 - [ ] T155 [US7] Schedule auto-purge Edge Function to run daily at 2 AM UTC using Supabase Database Webhooks or pg_cron, log execution results to activity_logs table
-- [ ] T156 [US7] Add trash routes to `src/app/app.routes.ts` under /admin/trash
-- [ ] T157 [US7] Update `docs/user-guide.md` adding "Trash & Recovery" section with restore workflow, permanent delete warning, auto-purge schedule
+- [x] T156 [US7] Add trash routes to `src/app/app.routes.ts` under /admin/trash
+- [x] T157 [US7] Update `docs/user-guide.md` adding "Trash & Recovery" section with restore workflow, permanent delete warning, auto-purge schedule
 - [ ] T158 [US7] Update `docs/architecture.md` documenting soft-delete implementation (deleted_at column), auto-purge Edge Function schedule
 - [ ] T159 [US7] Create ADR-007 in `docs/adr/007-soft-delete-and-trash-recovery.md` documenting 30-day retention rationale, auto-purge implementation
 
@@ -356,8 +356,8 @@ This is a single Angular project using Ionic framework. All paths relative to re
 - [ ] T170 Run integration test suite covering all user stories end-to-end, fix any failures
 - [ ] T171 Create admin settings page at `src/app/features/admin/settings/settings.page.ts` with cache clear, profile view, theme toggle (optional)
 - [ ] T172 Validate quickstart.md: follow setup steps on clean machine, verify all commands work, update any outdated instructions
-- [ ] T173 Create deployment guide in `docs/deployment.md` with Vercel/Netlify instructions, environment variable checklist, Supabase configuration
-- [ ] T174 Create troubleshooting guide in `docs/troubleshooting-admin.md` with common issues (auth failures, RLS errors, upload failures) and solutions
+- [x] T173 Create deployment guide in `docs/deployment.md` with Vercel/Netlify instructions, environment variable checklist, Supabase configuration
+- [x] T174 Create troubleshooting guide in `docs/troubleshooting-admin.md` with common issues (auth failures, RLS errors, upload failures) and solutions
 - [ ] T175 Final documentation review: verify all ADRs created, user-guide.md complete, architecture.md updated, data-schema.md accurate
 
 ---

@@ -36,6 +36,8 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { ActivityLogService } from '../../../../core/services/activity-log.service';
 import { ActivityLog, ActionType } from '../../../../core/models/activity-log.model';
+import { TopicsAdminService } from '../../../../core/services/topics-admin.service';
+import { Topic } from '../../../../core/models/topic.model';
 
 @Component({
   selector: 'app-article-form',
@@ -78,6 +80,7 @@ export class ArticleFormPage implements OnInit {
   private toastController = inject(ToastController);
   private alertController = inject(AlertController);
   private activityLogService = inject(ActivityLogService);
+  private topicsService = inject(TopicsAdminService);
 
   articleForm!: FormGroup;
   isEditMode = false;
@@ -87,17 +90,17 @@ export class ArticleFormPage implements OnInit {
   article: ArticleAdmin | null = null;
   activityHistory: ActivityLog[] = [];
   historyLoading = false;
+  topics: Topic[] = [];
   
   // For concurrent edit detection (T070)
   private lastUpdatedTimestamp: string | null = null;
 
   constructor() {
-    addIcons({arrowBackOutline,saveOutline,trashOutline,'saveOutline':saveOutline,'arrowBackOutline':arrowBackOutline,'trashOutline':trashOutline,});
-  }
-
+    addIcons({ arrowBackOutline, saveOutline, trashOutline });
   ngOnInit() {
     this.initForm();
     this.setupSlugAutoGeneration(); // T063
+    this.loadTopics(); // Load topics for dropdown
     
     // Check if edit mode
     this.articleId = this.route.snapshot.paramMap.get('id');
@@ -106,6 +109,8 @@ export class ArticleFormPage implements OnInit {
       this.loadArticle(this.articleId);
     } else {
       this.loading = false;
+    }
+  }   this.loading = false;
     }
   }
 
@@ -136,9 +141,6 @@ export class ArticleFormPage implements OnInit {
           const slug = this.generateSlug(title);
           this.articleForm.patchValue({ slug }, { emitEvent: false });
         }
-      });
-  }
-
   /**
    * Generate URL-friendly slug from title
    */
@@ -147,6 +149,24 @@ export class ArticleFormPage implements OnInit {
       .toLowerCase()
       .trim()
       .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  /**
+   * Load topics for dropdown
+   */
+  loadTopics() {
+    this.topicsService.list().subscribe({
+      next: (topics) => {
+        this.topics = topics;
+      },
+      error: (error) => {
+        console.error('Error loading topics:', error);
+        this.showToast('Failed to load topics', 'danger');
+      },
+    });
+  }   .replace(/[^\w\s-]/g, '')
       .replace(/[\s_-]+/g, '-')
       .replace(/^-+|-+$/g, '');
   }

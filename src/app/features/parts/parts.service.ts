@@ -115,12 +115,24 @@ export class PartsService {
 
   /**
    * Transform database response to ComputerPart model
-   * Maps: image -> image_url (via Supabase Storage), specs_json -> specifications
+   * Maps: image -> image_url (via Supabase Storage if path, or direct URL), specs_json -> specifications
    */
   private transformPart(data: any): ComputerPart {
+    let imageUrl: string | null = null;
+    
+    if (data.image) {
+      // If the image is already a full URL (starts with http), use it directly
+      if (data.image.startsWith('http')) {
+        imageUrl = data.image;
+      } else {
+        // Otherwise, generate Supabase Storage URL
+        imageUrl = this.supabase.getStorageUrl('parts', data.image);
+      }
+    }
+    
     return {
       ...data,
-      image_url: this.supabase.getStorageUrl('parts', data.image),
+      image_url: imageUrl,
       specifications: data.specs_json || {},
       model_number: data.model_number || null,
     };

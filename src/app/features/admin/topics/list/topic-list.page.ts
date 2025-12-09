@@ -14,17 +14,13 @@ import { finalize } from 'rxjs/operators';
   standalone: true,
   imports: [CommonModule, IonicModule, RouterModule]
 })
-export class TopicListPage implements OnInit, ViewWillEnter {
+export class TopicListPage implements ViewWillEnter {
   private topicsService = inject(TopicsAdminService);
   private alertController = inject(AlertController);
   private toastController = inject(ToastController);
 
   topics$ = new BehaviorSubject<Topic[]>([]);
   loading = false;
-
-  ngOnInit() {
-    // Initial load handled by ionViewWillEnter
-  }
 
   ionViewWillEnter() {
     this.loadTopics();
@@ -35,8 +31,14 @@ export class TopicListPage implements OnInit, ViewWillEnter {
     this.topicsService.list()
       .pipe(finalize(() => this.loading = false))
       .subscribe({
-        next: (topics) => this.topics$.next(topics),
-        error: (error) => console.error('Error loading topics', error)
+        next: (topics) => {
+          console.log('Topics loaded successfully:', topics);
+          this.topics$.next(topics);
+        },
+        error: (error) => {
+          console.error('Error loading topics:', error);
+          this.topics$.next([]);
+        }
       });
   }
 
