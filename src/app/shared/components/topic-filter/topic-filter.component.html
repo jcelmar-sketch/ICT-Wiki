@@ -1,0 +1,33 @@
+<div class="topic-filter">
+  <div class="filter-header">
+    <h3 class="filter-title">
+      <ion-icon name="folder-outline"></ion-icon>
+      Filter by Topic
+    </h3>
+    <ion-button 
+      *ngIf="hasSelection"
+      fill="clear" 
+      size="small"
+      (click)="onClearSelection()"
+    >
+      Clear
+    </ion-button>
+  </div>
+
+  <div class="topics-list" *ngIf="topics.length > 0">
+    <ion-chip 
+      *ngFor="let topic of topics"
+      [outline]="!isSelected(topic.id)"
+      [color]="isSelected(topic.id) ? 'primary' : 'medium'"
+      (click)="selectTopic(topic.id)"
+      class="topic-chip"
+    >
+      <ion-icon [name]="getTopicIcon(topic)"></ion-icon>
+      <ion-label>{{ topic.name }}</ion-label>
+    </ion-chip>
+  </div>
+
+  <div class="empty-state" *ngIf="topics.length === 0">
+    <p>No topics available</p>
+  </div>
+</div>

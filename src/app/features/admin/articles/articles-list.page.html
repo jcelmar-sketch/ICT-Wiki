@@ -1,0 +1,183 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button aria-label="Open navigation"></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Articles Management</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="createArticle()" aria-label="Create new article">
+        <ion-icon slot="start" name="add-outline"></ion-icon>
+        New Article
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Filters Card -->
+  <ion-card class="filters-card">
+    <ion-card-header>
+      <ion-card-title>Filters</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+        <ion-grid>
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label position="floating">Search by Title</ion-label>
+                <ion-input
+                  formControlName="search"
+                  type="text"
+                  placeholder="Article title..."
+                  clearInput
+                ></ion-input>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label position="floating">Topic</ion-label>
+                <ion-select formControlName="topic_id" interface="popover" placeholder="All topics">
+                  <ion-select-option value="">All Topics</ion-select-option>
+                  <ion-select-option *ngFor="let topic of topics" [value]="topic.id">
+                    {{ topic.name }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+
+          <ion-row>
+            <ion-col size="12" size-md="6">
+              <ion-item>
+                <ion-label position="floating">Status</ion-label>
+                <ion-select formControlName="status" interface="popover" placeholder="All statuses">
+                  <ion-select-option value="">All Statuses</ion-select-option>
+                  <ion-select-option value="draft">Draft</ion-select-option>
+                  <ion-select-option value="published">Published</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <div class="filter-actions ion-padding-top">
+          <ion-button type="submit" [disabled]="loading">
+            <ion-icon slot="start" name="search-outline"></ion-icon>
+            Apply Filters
+          </ion-button>
+          <ion-button type="button" fill="clear" (click)="resetFilters()" [disabled]="loading">
+            Reset
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="ion-text-center ion-padding">
+    <ion-spinner></ion-spinner>
+    <p>Loading articles...</p>
+  </div>
+
+  <!-- Articles Table -->
+  <ion-card class="table-card" *ngIf="!loading && articles.length > 0">
+    <ion-card-header class="table-header">
+      <ion-card-title>Results</ion-card-title>
+      <ion-badge color="medium">{{ articles.length }} articles</ion-badge>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="table-container">
+        <table class="articles-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Topic</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Updated</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let article of articles">
+              <td>
+                <div class="title-cell">
+                  <strong>{{ article.title }}</strong>
+                  <p class="slug-text">{{ article.slug }}</p>
+                </div>
+              </td>
+              <td>
+                <ion-badge color="primary">{{ getTopicName(article.topic_id) }}</ion-badge>
+              </td>
+              <td>
+                <ion-badge [color]="article.status === 'published' ? 'success' : 'warning'">
+                  {{ article.status | titlecase }}
+                </ion-badge>
+              </td>
+              <td class="date-cell">{{ formatDate(article.created_at) }}</td>
+              <td class="date-cell">{{ formatDate(article.updated_at) }}</td>
+              <td>
+                <div class="action-buttons">
+                  <ion-button
+                    size="small"
+                    fill="clear"
+                    color="primary"
+                    (click)="editArticle(article)"
+                    title="Edit article"
+                  >
+                    <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    fill="clear"
+                    color="danger"
+                    (click)="deleteArticle(article)"
+                    title="Delete article"
+                  >
+                    <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                  </ion-button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-controls ion-padding-top" *ngIf="articles.length > 0">
+        <ion-grid>
+          <ion-row class="ion-align-items-center ion-justify-content-between">
+            <ion-col size="auto">
+              <ion-button fill="clear" (click)="prevPage()" [disabled]="currentPage === 1 || loading">
+                <ion-icon slot="start" name="chevron-back-outline"></ion-icon>
+                Previous
+              </ion-button>
+            </ion-col>
+            <ion-col size="auto">
+              <p class="pagination-text">Page {{ currentPage }}</p>
+            </ion-col>
+            <ion-col size="auto">
+              <ion-button fill="clear" (click)="nextPage()" [disabled]="loading">
+                Next
+                <ion-icon slot="end" name="chevron-forward-outline"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && articles.length === 0" class="empty-state ion-text-center ion-padding">
+    <ion-icon name="document-text-outline" class="empty-icon"></ion-icon>
+    <h3>No Articles Found</h3>
+    <p>Create your first article to get started.</p>
+    <ion-button class="ion-margin-top" (click)="createArticle()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Create Article
+    </ion-button>
+  </div>
+</ion-content>

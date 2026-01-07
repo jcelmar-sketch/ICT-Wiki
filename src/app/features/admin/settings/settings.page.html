@@ -1,0 +1,210 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Admin Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Account Information Card -->
+  <ion-card *ngIf="currentUser">
+    <ion-card-header>
+      <ion-card-title>Account Information</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list lines="full">
+        <!-- Email -->
+        <ion-item>
+          <ion-label>
+            <p class="label-text">Email Address</p>
+            <h2 class="value-text">{{ currentUser.email }}</h2>
+          </ion-label>
+        </ion-item>
+
+        <!-- Role -->
+        <ion-item>
+          <ion-label>
+            <p class="label-text">Role</p>
+            <ion-badge color="primary">{{ currentUser.role | uppercase }}</ion-badge>
+          </ion-label>
+        </ion-item>
+
+        <!-- Last Login -->
+        <ion-item>
+          <ion-label>
+            <p class="label-text">Last Login</p>
+            <h2 class="value-text">{{ formatDate(currentUser.last_login_at) }}</h2>
+          </ion-label>
+        </ion-item>
+
+        <!-- Account Created -->
+        <ion-item>
+          <ion-label>
+            <p class="label-text">Account Created</p>
+            <h2 class="value-text">{{ formatDate(currentUser.created_at) }}</h2>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Password Change Section -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Security</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button
+        expand="block"
+        (click)="togglePasswordForm()"
+        [color]="showPasswordForm ? 'danger' : 'primary'"
+      >
+        {{ showPasswordForm ? 'Cancel' : 'Change Password' }}
+      </ion-button>
+
+      <!-- Password Change Form -->
+      <form [formGroup]="passwordForm" (ngSubmit)="submitPasswordChange()" *ngIf="showPasswordForm">
+        <ion-item class="form-item">
+          <ion-label position="floating">Current Password</ion-label>
+          <ion-input
+            formControlName="currentPassword"
+            [type]="currentPasswordFieldType"
+            required
+          ></ion-input>
+          <ion-button
+            slot="end"
+            fill="clear"
+            (click)="toggleCurrentPasswordVisibility()"
+          >
+            <ion-icon [name]="currentPasswordFieldType === 'password' ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getErrorMessage(passwordForm, 'currentPassword')">
+          <p class="error-text">{{ getErrorMessage(passwordForm, 'currentPassword') }}</p>
+        </ion-text>
+
+        <ion-item class="form-item">
+          <ion-label position="floating">New Password (min 8 characters)</ion-label>
+          <ion-input
+            formControlName="newPassword"
+            [type]="passwordFieldType"
+            required
+          ></ion-input>
+          <ion-button
+            slot="end"
+            fill="clear"
+            (click)="togglePasswordVisibility()"
+          >
+            <ion-icon [name]="passwordFieldType === 'password' ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getErrorMessage(passwordForm, 'newPassword')">
+          <p class="error-text">{{ getErrorMessage(passwordForm, 'newPassword') }}</p>
+        </ion-text>
+
+        <ion-item class="form-item">
+          <ion-label position="floating">Confirm New Password</ion-label>
+          <ion-input
+            formControlName="confirmPassword"
+            type="password"
+            required
+          ></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getErrorMessage(passwordForm, 'confirmPassword')">
+          <p class="error-text">{{ getErrorMessage(passwordForm, 'confirmPassword') }}</p>
+        </ion-text>
+        <ion-text color="danger" *ngIf="hasPasswordMismatch()">
+          <p class="error-text">{{ getFormErrorMessage(passwordForm, 'passwordMismatch') }}</p>
+        </ion-text>
+
+        <div class="button-group">
+          <ion-button
+            expand="block"
+            type="submit"
+            color="success"
+            [disabled]="passwordForm.invalid || passwordSubmitting"
+          >
+            <ion-spinner name="crescent" *ngIf="passwordSubmitting"></ion-spinner>
+            {{ passwordSubmitting ? 'Updating...' : 'Update Password' }}
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Email Change Section -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Email Address</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button
+        expand="block"
+        (click)="toggleEmailForm()"
+        [color]="showEmailForm ? 'danger' : 'primary'"
+      >
+        {{ showEmailForm ? 'Cancel' : 'Change Email' }}
+      </ion-button>
+
+      <!-- Email Change Form -->
+      <form [formGroup]="emailForm" (ngSubmit)="submitEmailChange()" *ngIf="showEmailForm">
+        <ion-item class="form-item">
+          <ion-label position="floating">New Email Address</ion-label>
+          <ion-input
+            formControlName="newEmail"
+            type="email"
+            required
+          ></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getErrorMessage(emailForm, 'newEmail')">
+          <p class="error-text">{{ getErrorMessage(emailForm, 'newEmail') }}</p>
+        </ion-text>
+
+        <ion-item class="form-item">
+          <ion-label position="floating">Current Password</ion-label>
+          <ion-input
+            formControlName="password"
+            [type]="emailPasswordFieldType"
+            required
+          ></ion-input>
+          <ion-button
+            slot="end"
+            fill="clear"
+            (click)="toggleEmailPasswordVisibility()"
+          >
+            <ion-icon [name]="emailPasswordFieldType === 'password' ? 'eye-off' : 'eye'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <ion-text color="danger" *ngIf="getErrorMessage(emailForm, 'password')">
+          <p class="error-text">{{ getErrorMessage(emailForm, 'password') }}</p>
+        </ion-text>
+
+        <ion-note color="warning" class="info-note">
+          <ion-icon name="information-circle"></ion-icon>
+          You will need to log in again with your new email address
+        </ion-note>
+
+        <div class="button-group">
+          <ion-button
+            expand="block"
+            type="submit"
+            color="success"
+            [disabled]="emailForm.invalid || emailSubmitting"
+          >
+            <ion-spinner name="crescent" *ngIf="emailSubmitting"></ion-spinner>
+            {{ emailSubmitting ? 'Updating...' : 'Update Email' }}
+          </ion-button>
+        </div>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Danger Zone -->
+  <ion-card color="danger">
+    <ion-card-header>
+      <ion-card-title>Danger Zone</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Additional account management features (logout all sessions, account deletion) can be added here in future versions.</p>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

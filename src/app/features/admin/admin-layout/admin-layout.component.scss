@@ -1,0 +1,157 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.admin-shell {
+  --side-width: 280px;
+  --side-max-width: 320px;
+  min-height: 100%;
+}
+
+ion-menu.admin-menu {
+  --width: 280px;
+  --side-width: 280px;
+
+  ion-toolbar {
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+  }
+
+  ion-item {
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+    --inner-padding-end: 0;
+    margin: 0.25rem 0.5rem;
+    border-radius: 8px;
+
+    &.active {
+      --background: var(--ion-color-primary);
+      --color: var(--ion-color-primary-contrast);
+      font-weight: 600;
+
+      ion-icon {
+        color: var(--ion-color-primary-contrast);
+      }
+    }
+
+    &:hover:not(.active) {
+      --background: var(--ion-color-light);
+    }
+  }
+
+  ion-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+  }
+
+  ion-footer {
+    border-top: 1px solid var(--ion-color-light-shade);
+
+    .user-role {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--ion-color-medium);
+      margin-top: 0.25rem;
+    }
+  }
+}
+
+ion-header {
+  ion-toolbar {
+    --padding-start: 1rem;
+    --padding-end: 1rem;
+  }
+}
+
+ion-content {
+  --background: var(--ion-color-light);
+  min-height: 100%;
+}
+
+// Session warning
+.session-warning {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--ion-color-warning);
+  color: var(--ion-color-warning-contrast);
+
+  ion-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    flex: 1;
+  }
+
+  ion-button {
+    flex-shrink: 0;
+  }
+}
+
+.mobile-only {
+  display: none;
+}
+
+// Desktop layout (>=1024px): full labels
+@media (min-width: 1024px) {
+  ion-menu.admin-menu {
+    --width: 280px;
+  }
+}
+
+// Tablet layout (768px - 1023px): collapsed icon-only sidebar
+@media (max-width: 1023px) and (min-width: 768px) {
+  ion-menu.admin-menu {
+    --width: 96px;
+    --side-width: 96px;
+
+    ion-toolbar {
+      --padding-start: 0.75rem;
+      --padding-end: 0.75rem;
+      ion-title {
+        font-size: 0.95rem;
+      }
+    }
+
+    ion-item {
+      --padding-start: 0.5rem;
+      --padding-end: 0.5rem;
+      justify-content: center;
+
+      ion-label {
+        display: none;
+      }
+
+      ion-icon {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+// Mobile layout (<768px): drawer menu and larger touch targets
+@media (max-width: 767px) {
+  ion-split-pane {
+    --side-width: 100%;
+  }
+
+  ion-menu.admin-menu {
+    --width: 260px;
+    --side-width: 260px;
+
+    ion-item {
+      --padding-start: 1.25rem;
+      --padding-end: 1.25rem;
+      min-height: 52px;
+    }
+  }
+
+  .mobile-only {
+    display: inline-flex;
+  }
+}

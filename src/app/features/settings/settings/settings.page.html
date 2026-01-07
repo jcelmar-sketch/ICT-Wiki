@@ -1,0 +1,133 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="settings-container">
+    <!-- Cache Statistics -->
+    <div class="section">
+      <h2 class="section-title">
+        <ion-icon name="pie-chart-outline"></ion-icon>
+        Cache Statistics
+      </h2>
+
+      <ion-card *ngIf="!loading && stats">
+        <ion-card-content>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Articles Cached</span>
+              <span class="stat-value">{{ stats.articleCount }}</span>
+            </div>
+
+            <div class="stat-item">
+              <span class="stat-label">Parts Cached</span>
+              <span class="stat-value">{{ stats.partCount }}</span>
+            </div>
+
+            <div class="stat-item">
+              <span class="stat-label">Storage Used</span>
+              <span class="stat-value">{{ formatSize(stats.totalSize) }}</span>
+            </div>
+
+            <div class="stat-item">
+              <span class="stat-label">Storage Quota</span>
+              <span class="stat-value">{{ formatSize(stats.quota) }}</span>
+            </div>
+
+            <div class="stat-item full-width">
+              <span class="stat-label">Usage</span>
+              <ion-progress-bar 
+                [value]="stats.usage / 100"
+                [color]="stats.usage > 80 ? 'danger' : 'primary'"
+              ></ion-progress-bar>
+              <span class="stat-value">{{ stats.usage.toFixed(1) }}%</span>
+            </div>
+
+            <div class="stat-item">
+              <span class="stat-label">Oldest Entry</span>
+              <span class="stat-value">{{ formatDate(stats.oldestEntry) }}</span>
+            </div>
+
+            <div class="stat-item">
+              <span class="stat-label">Newest Entry</span>
+              <span class="stat-value">{{ formatDate(stats.newestEntry) }}</span>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="loading">
+        <ion-card-content>
+          <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Cache Management -->
+    <div class="section">
+      <h2 class="section-title">
+        <ion-icon name="settings-outline"></ion-icon>
+        Cache Management
+      </h2>
+
+      <ion-list>
+        <ion-item button (click)="clearExpired()">
+          <ion-icon slot="start" name="time-outline" color="primary"></ion-icon>
+          <ion-label>
+            <h3>Clear Expired Cache</h3>
+            <p>Remove entries older than 7 days</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button (click)="clearArticles()">
+          <ion-icon slot="start" name="document-text-outline" color="warning"></ion-icon>
+          <ion-label>
+            <h3>Clear Article Cache</h3>
+            <p>{{ stats?.articleCount || 0 }} articles cached</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button (click)="clearParts()">
+          <ion-icon slot="start" name="hardware-chip-outline" color="warning"></ion-icon>
+          <ion-label>
+            <h3>Clear Parts Cache</h3>
+            <p>{{ stats?.partCount || 0 }} parts cached</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item button (click)="clearAll()">
+          <ion-icon slot="start" name="trash-outline" color="danger"></ion-icon>
+          <ion-label>
+            <h3>Clear All Cache</h3>
+            <p>Remove all offline data</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- Offline Info -->
+    <div class="section">
+      <h2 class="section-title">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Offline Access
+      </h2>
+
+      <ion-card>
+        <ion-card-content>
+          <p class="info-text">
+            ICT Wiki automatically caches content for offline access. 
+            Cached articles and parts are available even without an internet connection.
+          </p>
+          <p class="info-text">
+            Cache expires after 7 days or when storage limit is reached (50MB).
+          </p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

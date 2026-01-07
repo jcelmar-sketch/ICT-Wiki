@@ -1,0 +1,334 @@
+// Settings Page Styles
+
+// Card styling
+ion-card {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+
+  &:last-child {
+    margin-bottom: 2rem;
+  }
+}
+
+ion-card-header {
+  padding: 1rem;
+  border-bottom: 2px solid var(--ion-color-light);
+}
+
+ion-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ion-color-primary);
+}
+
+ion-card-content {
+  padding: 1rem;
+}
+
+// Form styling
+form {
+  margin-top: 1rem;
+}
+
+.form-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 0.5rem;
+
+  ion-label {
+    margin-bottom: 0.5rem;
+  }
+
+  ion-input {
+    --padding-bottom: 0.5rem;
+    --padding-top: 0.5rem;
+  }
+}
+
+.error-text {
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0.75rem 0;
+  padding: 0 1rem;
+}
+
+.info-note {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background-color: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+  border-left: 4px solid var(--ion-color-warning);
+
+  ion-icon {
+    margin-right: 0.25rem;
+  }
+}
+
+// Button styling
+ion-button {
+  --border-radius: 6px;
+  font-weight: 500;
+  text-transform: none;
+  margin: 0.5rem 0;
+
+  &[color="primary"] {
+    --background: var(--ion-color-primary);
+    --color: white;
+
+    &:hover {
+      --background: var(--ion-color-primary-shade);
+    }
+  }
+
+  &[color="success"] {
+    --background: var(--ion-color-success);
+    --color: white;
+
+    &:hover:not([disabled]) {
+      --background: var(--ion-color-success-shade);
+    }
+
+    &[disabled] {
+      --background: var(--ion-color-light);
+      --color: var(--ion-color-medium);
+      opacity: 0.6;
+    }
+  }
+
+  &[color="danger"] {
+    --background: var(--ion-color-danger);
+    --color: white;
+
+    &:hover {
+      --background: var(--ion-color-danger-shade);
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+
+  ion-button {
+    flex: 1;
+  }
+}
+
+// Account Information List
+ion-list {
+  --border: none;
+}
+
+ion-item {
+  --padding-start: 0;
+  --padding-end: 0;
+  --inner-padding-end: 0;
+  border-bottom: 1px solid var(--ion-color-light);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  ion-label {
+    margin: 0.75rem 0;
+
+    .label-text {
+      font-size: 0.85rem;
+      color: var(--ion-color-medium);
+      margin: 0 0 0.25rem 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .value-text {
+      font-size: 1rem;
+      color: var(--ion-color-dark);
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  ion-badge {
+    --padding-start: 0.75rem;
+    --padding-end: 0.75rem;
+    --padding-top: 0.35rem;
+    --padding-bottom: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+// Input styling
+ion-input {
+  --padding-bottom: 0.75rem;
+  --padding-top: 0.75rem;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  border: 2px solid var(--ion-color-light);
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: var(--ion-color-primary);
+  }
+}
+
+// Password visibility toggle button
+ion-button[fill="clear"] {
+  --color: var(--ion-color-primary);
+  height: 32px;
+  width: 32px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 1.25rem;
+  }
+}
+
+// Spinner styling
+ion-spinner {
+  margin-right: 0.5rem;
+}
+
+// Badge styling
+ion-badge {
+  &[color="primary"] {
+    --background: var(--ion-color-primary);
+    --color: white;
+  }
+
+  &[color="warning"] {
+    --background: var(--ion-color-warning);
+    --color: var(--ion-color-dark);
+  }
+
+  &[color="danger"] {
+    --background: var(--ion-color-danger);
+    --color: white;
+  }
+
+  &[color="success"] {
+    --background: var(--ion-color-success);
+    --color: white;
+  }
+}
+
+// Danger Zone Card
+ion-card[color="danger"] {
+  --background: rgba(255, 59, 48, 0.05);
+  border: 2px solid var(--ion-color-danger);
+
+  ion-card-header {
+    border-bottom-color: var(--ion-color-danger);
+  }
+
+  ion-card-title {
+    color: var(--ion-color-danger);
+  }
+
+  p {
+    color: var(--ion-color-danger);
+    font-size: 0.9rem;
+  }
+}
+
+// Loading spinner
+ion-content ::ng-deep ion-spinner {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+// Responsive design
+@media (max-width: 480px) {
+  ion-card {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  ion-card-content {
+    padding: 0.75rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+
+    ion-button {
+      width: 100%;
+    }
+  }
+
+  .form-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .info-note {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+}
+
+// Light mode adjustments
+@media (prefers-color-scheme: light) {
+  ion-card {
+    background: white;
+  }
+
+  .info-note {
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  ion-card {
+    background: var(--ion-color-step-100);
+  }
+
+  ion-input {
+    --background: var(--ion-color-step-150);
+    color: var(--ion-color-light);
+
+    &::placeholder {
+      color: var(--ion-color-medium);
+    }
+  }
+
+  .info-note {
+    background-color: rgba(255, 193, 7, 0.15);
+  }
+
+  .error-text {
+    color: var(--ion-color-danger-light);
+  }
+}
+
+// Animation for form visibility toggle
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+form {
+  animation: slideDown 0.3s ease-out;
+}
+
+// Accessibility improvements
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

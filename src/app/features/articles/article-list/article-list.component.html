@@ -1,0 +1,28 @@
+<div class="article-list">
+  <!-- Error -->
+  <ion-card *ngIf="errorMessage && !loading" color="danger">
+    <ion-card-content>{{ errorMessage }}</ion-card-content>
+  </ion-card>
+
+  <!-- Loading Initial -->
+  <app-skeleton-loader *ngIf="loading" variant="article-card" [count]="5"></app-skeleton-loader>
+
+  <!-- Articles -->
+  <app-article-card
+    *ngFor="let article of articles"
+    [article]="article"
+  ></app-article-card>
+
+  <!-- Loading More -->
+  <app-skeleton-loader
+    *ngIf="loadingMore"
+    variant="article-card"
+    [count]="2"
+  ></app-skeleton-loader>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && articles.length === 0 && !errorMessage">
+    <ion-icon name="document-text-outline" size="large"></ion-icon>
+    <p>No articles found in this topic</p>
+  </div>
+</div>

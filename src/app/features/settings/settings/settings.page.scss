@@ -1,0 +1,103 @@
+/**
+ * Settings Page Styles
+ * Tasks T100-T105: Cache management UI
+ */
+
+.settings-container {
+  padding: 16px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px;
+  color: var(--ion-color-dark);
+
+  ion-icon {
+    font-size: 22px;
+    color: var(--ion-color-primary);
+  }
+}
+
+// Statistics
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--ion-color-medium);
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--ion-color-dark);
+    }
+
+    ion-progress-bar {
+      margin: 4px 0;
+      height: 8px;
+      border-radius: 4px;
+    }
+  }
+}
+
+// Management List
+ion-list {
+  background: transparent;
+  padding: 0;
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    margin-bottom: 1px;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 4px;
+    }
+
+    p {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+      margin: 0;
+    }
+
+    ion-icon {
+      font-size: 24px;
+      margin-right: 16px;
+    }
+  }
+}
+
+// Info Text
+.info-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ion-color-medium);
+  margin: 0 0 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}

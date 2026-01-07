@@ -1,0 +1,42 @@
+<div class="tag-filter">
+  <div class="filter-header">
+    <h3 class="filter-title">
+      <ion-icon name="pricetag-outline"></ion-icon>
+      Filter by Tags
+    </h3>
+    <ion-button 
+      *ngIf="hasSelection"
+      fill="clear" 
+      size="small"
+      (click)="onClearAll()"
+    >
+      Clear All
+    </ion-button>
+  </div>
+
+  <div class="tags-container" *ngIf="tags.length > 0">
+    <ion-chip 
+      *ngFor="let tag of tags"
+      [outline]="!isSelected(tag.id)"
+      [color]="isSelected(tag.id) ? 'primary' : 'medium'"
+      (click)="toggleTag(tag.id)"
+      class="tag-chip"
+    >
+      <ion-label>{{ tag.name }}</ion-label>
+      <ion-icon 
+        *ngIf="isSelected(tag.id)"
+        name="close-circle"
+      ></ion-icon>
+    </ion-chip>
+  </div>
+
+  <div class="empty-state" *ngIf="tags.length === 0">
+    <p>No tags available</p>
+  </div>
+
+  <div class="selection-count" *ngIf="hasSelection">
+    <ion-text color="medium">
+      <small>{{ selectedTags.length }} tag{{ selectedTags.length > 1 ? 's' : '' }} selected</small>
+    </ion-text>
+  </div>
+</div>

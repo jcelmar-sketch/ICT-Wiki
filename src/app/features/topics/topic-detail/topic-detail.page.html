@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>{{ topic?.name || 'Topic' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="topic-detail-container">
+    <!-- Topic Header -->
+    <div *ngIf="topic" class="topic-header">
+      <ion-icon [name]="topic.icon || 'folder-outline'" size="large"></ion-icon>
+      <h1>{{ topic.name }}</h1>
+      <p *ngIf="topic.description">{{ topic.description }}</p>
+    </div>
+
+    <!-- Article List with Infinite Scroll -->
+    <app-article-list
+      *ngIf="topic"
+      [topicId]="topic.id"
+    ></app-article-list>
+  </div>
+</ion-content>

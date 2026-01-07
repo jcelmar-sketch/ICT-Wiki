@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/parts"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Part Details</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading Skeleton -->
+  <div *ngIf="loading">
+    <app-skeleton-loader variant="article-detail"></app-skeleton-loader>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <ion-icon name="alert-circle-outline" class="error-icon"></ion-icon>
+    <h2>Failed to Load Part</h2>
+    <p>Check your connection and try again</p>
+    <ion-button (click)="retry()">
+      <ion-icon slot="start" name="refresh-outline"></ion-icon>
+      Retry
+    </ion-button>
+  </div>
+
+  <!-- Part Content -->
+  <div *ngIf="part && !loading" class="part-content">
+    <!-- Header Image -->
+    <div class="part-header">
+      <img 
+        [src]="part.image_url || 'assets/images/placeholder-part.svg'" 
+        [alt]="part.name"
+        class="part-image"
+      />
+      
+      <div class="part-meta">
+        <ion-chip class="category-chip">
+          <ion-icon name="hardware-chip-outline"></ion-icon>
+          <ion-label>{{ part.category }}</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    <!-- Part Info -->
+    <div class="part-info">
+      <h1>{{ part.name }}</h1>
+      <p class="description">{{ part.description }}</p>
+    </div>
+
+    <!-- Specifications -->
+    <div class="specifications" *ngIf="part.specifications && getSpecEntries().length > 0">
+      <h2 class="section-title">
+        <ion-icon name="list-outline"></ion-icon>
+        Technical Specifications
+      </h2>
+
+      <div class="specs-grid">
+        <div 
+          *ngFor="let spec of getSpecEntries()" 
+          class="spec-item"
+        >
+          <div class="spec-key">{{ formatSpecKey(spec[0]) }}</div>
+          <div class="spec-value">{{ spec[1] }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="additional-info" *ngIf="part.manufacturer || part.model_number">
+      <h2 class="section-title">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Product Information
+      </h2>
+
+      <ion-list lines="none" class="info-list">
+        <ion-item *ngIf="part.manufacturer">
+          <ion-label>
+            <p>Manufacturer</p>
+            <h3>{{ part.manufacturer }}</h3>
+          </ion-label>
+        </ion-item>
+
+        <ion-item *ngIf="part.model_number">
+          <ion-label>
+            <p>Model Number</p>
+            <h3>{{ part.model_number }}</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>

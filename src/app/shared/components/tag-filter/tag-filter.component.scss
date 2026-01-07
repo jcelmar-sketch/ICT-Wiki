@@ -1,0 +1,79 @@
+/**
+ * Tag Filter Component Styles
+ * Tasks T078-T085: Tag filtering UI
+ */
+
+.tag-filter {
+  padding: 16px;
+  background-color: var(--ion-card-background);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.filter-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--ion-color-dark);
+
+  ion-icon {
+    font-size: 20px;
+    color: var(--ion-color-primary);
+  }
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tag-chip {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  min-height: 32px;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  ion-label {
+    font-size: 14px;
+  }
+
+  ion-icon {
+    font-size: 18px;
+    margin-left: 4px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 24px;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.selection-count {
+  margin-top: 8px;
+  text-align: center;
+}

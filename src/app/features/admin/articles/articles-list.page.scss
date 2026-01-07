@@ -1,0 +1,142 @@
+.filters-card {
+  margin-bottom: 20px;
+
+  .filter-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+}
+
+.table-card {
+  .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 12px;
+
+    ion-card-title {
+      margin: 0;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .articles-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+
+    thead {
+      background: var(--ion-color-light);
+      border-bottom: 2px solid var(--ion-color-light-shade);
+
+      th {
+        text-align: left;
+        padding: 12px 14px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--ion-color-medium);
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid var(--ion-color-light);
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: var(--ion-color-light);
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 12px 14px;
+          vertical-align: middle;
+          font-size: 0.95rem;
+
+          &.date-cell {
+            font-size: 0.85rem;
+            color: var(--ion-color-medium);
+            white-space: nowrap;
+          }
+
+          .title-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+
+            strong {
+              font-weight: 600;
+              color: var(--ion-text-color);
+            }
+
+            .slug-text {
+              font-size: 0.8rem;
+              color: var(--ion-color-medium);
+              margin: 0;
+              font-family: monospace;
+            }
+          }
+
+          .action-buttons {
+            display: flex;
+            gap: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .pagination-controls {
+    border-top: 1px solid var(--ion-color-light);
+
+    .pagination-text {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+
+  .empty-icon {
+    font-size: 64px;
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 12px 0 6px 0;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0 0 12px 0;
+    color: var(--ion-color-medium);
+    max-width: 300px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .table-container {
+    font-size: 0.85rem;
+
+    table th,
+    table td {
+      padding: 8px 10px;
+    }
+  }
+}

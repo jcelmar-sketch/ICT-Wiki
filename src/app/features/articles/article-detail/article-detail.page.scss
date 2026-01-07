@@ -1,0 +1,142 @@
+.article-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-bottom: 48px; // Extra bottom padding for mobile
+
+  .cover-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    margin-bottom: 24px;
+  }
+
+  .article-body {
+    padding: 0 16px 32px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0 0 16px;
+    color: var(--ion-text-color);
+  }
+
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+
+    ion-chip {
+      font-size: 13px;
+    }
+  }
+
+  .markdown-content {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--ion-text-color);
+
+    h2, h3, h4 {
+      margin: 24px 0 12px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0 0 16px;
+    }
+
+    code {
+      background: var(--ion-color-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+    }
+
+    pre {
+      background: var(--ion-color-light);
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+  }
+
+  .related-section {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 2px solid var(--ion-color-light-shade);
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .related-card {
+      margin: 0;
+
+      img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+      }
+
+      h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 8px;
+      }
+
+      p {
+        font-size: 14px;
+        color: var(--ion-color-medium);
+        margin: 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .article-content {
+    .markdown-content {
+      code {
+        background: var(--ion-color-dark-tint);
+      }
+
+      pre {
+        background: var(--ion-color-dark-tint);
+      }
+    }
+
+    .related-section {
+      border-top-color: var(--ion-color-dark-shade);
+
+      .related-card p {
+        color: var(--ion-color-step-400, #999999);
+      }
+    }
+  }
+}
